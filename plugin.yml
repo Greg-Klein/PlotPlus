@@ -2,7 +2,8 @@ name: PlotPlus
 main: fr.mrkold.plotplus.PlotPlusPlugin
 version: '1.4'
 author: MrKold
-depend: [PlotMe]
+softdepend: [PlotMe]
 description: Change time and weather on your plot
 commands:
-    pp:
+    plotplus:
+      aliases: [pp]

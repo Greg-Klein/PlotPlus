@@ -23,28 +23,33 @@ import com.worldcretornica.plotme.PlotManager;
 
 public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	
+	// --- Definition des variables ---
+	
 	private final ChatColor RED = ChatColor.RED;
 	private final ChatColor GREEN = ChatColor.GREEN;
 	private final ChatColor AQUA = ChatColor.AQUA;
 	private String lang = "";
     private File myFile;
-	
+    
+    // ---------------------------------
+    
 	@Override
-	public void onDisable() 
+	public void onDisable() 														// A la desactivation
 	{
-		PluginDescriptionFile pdf = this.getDescription(); //Gets plugin.yml
+		PluginDescriptionFile pdf = this.getDescription(); 							// recuperer les infos de plugin.yml
 		getLogger().info(pdf.getName() + " v"+ pdf.getVersion() + " disabled");
 	}
 	
+	// ---------------------------------
+	
 	@Override
-	public void onEnable() {
-		PluginDescriptionFile pdf = this.getDescription(); //Gets plugin.yml
-		saveDefaultConfig();
+	public void onEnable() {														// A l'activation
+		PluginDescriptionFile pdf = this.getDescription(); 							// recuperer les infos de plugin.yml
+		saveDefaultConfig(); 														// ecrire le fichier de config par defaut
 		getServer().getPluginManager().registerEvents(this, this);
 		getLogger().info(pdf.getName() + " v"+ pdf.getVersion() + " enabled");
 		
-		//Get/Create File
-        myFile = new File(getDataFolder(), "plots.yml");
+        myFile = new File(getDataFolder(), "plots.yml");							// Creer le fichier plots.yml s'il n'existe pas
         if (!myFile.exists()) {
             try {
                 myFile.createNewFile();
@@ -54,14 +59,16 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
         }
 	}
 	
+	// ---------------------------------
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
 		
-		if(label.equalsIgnoreCase("pp")) {
-		    if(sender instanceof Player) {
+		if((label.equalsIgnoreCase("pp"))||(label.equalsIgnoreCase("plotplus"))) { 						// On verifie que la commande est /pp ou /plotplus
+		    if(sender instanceof Player) { 																// On verifie que la commande est entree par le joueur
 		    	if(sender.hasPermission("plotplus.use")){
-		    		if (args.length == 0) {
-			    		PluginDescriptionFile pdf = this.getDescription(); //Gets plugin.yml
+		    		if (args.length == 0) { 																// Si la commande n'a pas d'argument
+			    		PluginDescriptionFile pdf = this.getDescription();
 			    		String version = pdf.getVersion();
 			    		String nomplugin = pdf.getName();
 						sender.sendMessage(AQUA + "------------------------------");
@@ -78,59 +85,55 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			    		String a0 = args[0];
 			            Player p = (Player) sender;
 			            lang = getConfig().getString("lang");
-			            YamlConfiguration plots = YamlConfiguration.loadConfiguration(myFile);
+			            YamlConfiguration plots = YamlConfiguration.loadConfiguration(myFile);					// Chargement du fichier plots.yml
 			            
-			            if (sender.hasPermission("plotplus.admin")) {
-				    		if (a0.equalsIgnoreCase("reload")){
-				    			reloadConfig();
-				    			sender.sendMessage(AQUA + "[PlotPlus] Configuration reloaded");
-				    			return true;
-				    		}
+			            if ((a0.equalsIgnoreCase("reload")) && (sender.hasPermission("plotplus.admin"))) {
+				    		reloadConfig();
+				    		sender.sendMessage(AQUA + "[PlotPlus] Configuration reloaded");
+				    		return true;
 						}
 			            
-			            if(PlotManager.getMap(p) == null) {
+			            if(PlotManager.getMap(p) == null) {															// Si la map n'est pas un plotworld
 				            p.sendMessage(RED + (getConfig().getString("messages."+ lang +".noplotworld")));
 				        } else {
+				            String id = PlotManager.getPlotId(p);													// recuperer l'id du plot où se trouve le joueur
 				            
-				            //The plotmanager class contains static methods. Note that this is not the case for PlotMe-Core
-				            String id = PlotManager.getPlotId(p);
-				            
-				            if(id.equals("")) {
+				            if(id.equals("")) {																		// id == 0 : Ce n'est pas un plot
 				                p.sendMessage(RED + (getConfig().getString("messages."+ lang +".noplot")));
 				            } else {	                
-		    		            Plot plot = PlotManager.getPlotById(p);  //this function supports many arguments; world, location, id, etc..
+		    		            Plot plot = PlotManager.getPlotById(p);												// recuperer les infos du plot
 		    		            String joueur = p.getName();
 		    		            
-		    		            if(plot != null && ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin"))) {
+		    		            if(plot != null && ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin"))) {		// On vérifie que le plot appartient au joueur et qu'il a la permission
 		    		            	
 		    		            	String plotid = plot.id;
 		    		            	
-		    		            	if (a0.equalsIgnoreCase("resettime")) {
-		    		            		plots.set("plots." + plotid + ".time", 0);
+		    		            	if (a0.equalsIgnoreCase("resettime")) {											// Si l'argument est resettime
+		    		            		plots.set("plots." + plotid + ".time", 0);									// On met time a 0 dans le fichier plots.yml
 		    		            	    try {
 											plots.save(myFile);
 										} catch (IOException e) {
-											// TODO Auto-generated catch block
+											// catch block
 											e.printStackTrace();
 										}
 										p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".resettime")));
 									}
-		    		            	else if (a0.equalsIgnoreCase("rain")) {
-		    		            		plots.set("plots." + plotid + ".rain", true);
+		    		            	else if (a0.equalsIgnoreCase("rain")) {											// Si l'argument est resettime
+		    		            		plots.set("plots." + plotid + ".rain", true);								// On met rain a true dans le fichier plots.yml
 		    		            		try {
 		    		            			plots.save(myFile);
 		    		            		} catch (IOException e) {
-		    		            			// TODO Auto-generated catch block
+		    		            			// catch block
 		    		            			e.printStackTrace();
 		    		            		}
 		    		            		p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".setrain")));
 									}
-		    		            	else if (a0.equalsIgnoreCase("resetweather")) {
-		    		            		plots.set("plots." + plotid + ".rain", false);
+		    		            	else if (a0.equalsIgnoreCase("resetweather")) {									// Si l'argument est resetweather
+		    		            		plots.set("plots." + plotid + ".rain", false);								// On met rain a false dans le fichier plots.yml
 		    		            		try {
 											plots.save(myFile);
 										} catch (IOException e) {
-											// TODO Auto-generated catch block
+											// catch block
 											e.printStackTrace();
 										}
 										p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".resetweather")));
@@ -138,22 +141,22 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 		    		            	else {
 		    		            		int setheure;
 		    		            		try {
-		    		            			setheure =  Integer.parseInt(a0);
+		    		            			setheure =  Integer.parseInt(a0);										// Recuperation de l'heure dans setheure depuis l'argument
 		    		            			if ((setheure <= 0)||(setheure > 24000)){
 		    		            				p.sendMessage(RED + (getConfig().getString("messages."+ lang +".badtime")));
 		    		            				return false;
 		    		            			}
-		    		            			plots.set("plots." + plotid + ".time", setheure);
+		    		            			plots.set("plots." + plotid + ".time", setheure);						// On met l'heure à setheure dans le fichier plots.yml
 		    		            			try {
 												plots.save(myFile);
 											} catch (IOException e) {
-												// TODO Auto-generated catch block
+												// catch block
 												e.printStackTrace();
 											}
 										    p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".settime")) + ": " + setheure + "ticks");
 		    		            		}
 		    		            		catch (NumberFormatException nfe) {
-		    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".badargument")));
+		    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".badargument")));	// Si l'argument ne correspond à rien on renvoi un message d'erreur
 		    		            			return false;
 		    		            		}
 									}
@@ -174,11 +177,11 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onMove(PlayerMoveEvent evt)
+	public void onMove(PlayerMoveEvent evt)												// Lorsque le joueur bouge
 	{
 		Player p = evt.getPlayer();
 		File plotsFile = new File(this.getDataFolder(), "plots.yml");
-        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);
+        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);		// Chargement du fichier plots.yml
 		
 			Location to = evt.getTo();
 			
@@ -188,14 +191,14 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			{
 				Plot plot = PlotManager.getPlotById(p, idTo);
 				
-				if(plot != null)
+				if(plot != null)														// On teste si l'on est sur un plot
 				{
 					String plotid = plot.id;
-					int heure = plots.getInt("plots." + plotid + ".time");
+					int heure = plots.getInt("plots." + plotid + ".time");				// Recuperation des donnees dans le fichier de configuration plots.yml
 					Boolean rain = plots.getBoolean("plots." + plotid + ".rain");
 					if(heure != 0){
 						p.setPlayerTime(heure, false);
-					}
+					}																	// On applique les parametres
 					if(rain){
 						p.setPlayerWeather(WeatherType.DOWNFALL);
 					}
@@ -203,7 +206,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			}
 			else
 			{
-				p.resetPlayerTime();
+				p.resetPlayerTime();													// Reinitialisation des parametres
 				p.resetPlayerWeather();
 			}
 	}
