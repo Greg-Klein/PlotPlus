@@ -6,7 +6,6 @@ import java.io.IOException;
 import me.confuser.barapi.BarAPI;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -33,7 +32,6 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	private final ChatColor AQUA = ChatColor.AQUA;
 	private String lang;
     private File myFile;
-    private Location to;
     private PluginDescriptionFile pdf = this.getDescription();						// recuperer les infos de plugin.yml
     private String version = pdf.getVersion();
 	private String nomplugin = pdf.getName();
@@ -127,7 +125,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 		    		            	String plotid = plot.id;
 		    		            	
 		    		            	if (a0.equalsIgnoreCase("resettime")) {											// Si l'argument est resettime
-		    		            		plots.set("plots." + world + "." + plotid + ".time", 0);									// On met time a 0 dans le fichier plots.yml
+		    		            		plots.set("plots." + world + "." + plotid + ".time", null);									// On supprime time dans le fichier plots.yml
 		    		            	    try {
 											plots.save(myFile);
 										} catch (IOException e) {
@@ -136,7 +134,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 										}
 										p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".resettime")));
 									}
-		    		            	else if (a0.equalsIgnoreCase("rain")) {											// Si l'argument est resettime
+		    		            	else if (a0.equalsIgnoreCase("rain")) {											// Si l'argument est rain
 		    		            		plots.set("plots." + world + "." + plotid + ".rain", true);								// On met rain a true dans le fichier plots.yml
 		    		            		try {
 		    		            			plots.save(myFile);
@@ -147,7 +145,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 		    		            		p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".setrain")));
 									}
 		    		            	else if (a0.equalsIgnoreCase("resetweather")) {									// Si l'argument est resetweather
-		    		            		plots.set("plots." + world + "." + plotid + ".rain", false);								// On met rain a false dans le fichier plots.yml
+		    		            		plots.set("plots." + world + "." + plotid + ".rain", null);								// On supprime rain dans le fichier plots.yml
 		    		            		try {
 											plots.save(myFile);
 										} catch (IOException e) {
@@ -199,24 +197,37 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			Player p = evt.getPlayer();
 			File plotsFile = new File(this.getDataFolder(), "plots.yml");
 	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);		// Chargement du fichier plots.yml
-			to = evt.getTo();
-			String idTo = PlotManager.getPlotId(to);
+			String id = PlotManager.getPlotId(p.getLocation());
 			
-			if(onPlot(p, idTo)){															// On teste si l'on est sur un plot
-				Plot plot = PlotManager.getPlotById(p, idTo);
-				String plotid = plot.id;
+			if(onPlot(p, id)){															// On teste si l'on est sur un plot
+				Plot plot = PlotManager.getPlotById(p, id);
 				String world = p.getWorld().getName();
-				int heure = plots.getInt("plots." + world + "." + plotid + ".time");				// Recuperation des donnees dans le fichier de configuration plots.yml
-				Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
-				if(heure != 0){
-					p.setPlayerTime(heure, false);
-				}																	// On applique les parametres
-				if(rain){
-					p.setPlayerWeather(WeatherType.DOWNFALL);
+				if(plot != null){
+					String plotid = plot.id;
+					int heure = plots.getInt("plots." + world + "." + plotid + ".time");				// Recuperation des donnees dans le fichier de configuration plots.yml
+					Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
+					if(heure != 0){
+						p.setPlayerTime(heure, false);
+					}																	// On applique les parametres
+					if(rain){
+						p.setPlayerWeather(WeatherType.DOWNFALL);
+					}
+
+					
+						if(BarAPIOK){
+							BarAPI.setMessage(p, (getConfig().getString("messages."+ lang +".owner") + " " + plot.owner));
+						}
+					
 				}
-				String owner = plot.owner;
-				if(BarAPIOK && (owner != null)){
-					BarAPI.setMessage(p, (getConfig().getString("messages."+ lang +".owner") + " " + owner));
+				else{
+					String plotid = PlotManager.getPlotId(p.getLocation());
+					plots.set("plots." + world + "." + plotid, null);
+					try {
+						plots.save(myFile);
+					} catch (IOException e) {
+						// catch block
+						e.printStackTrace();
+					}
 				}
 			}
 			else
@@ -229,14 +240,9 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			}
 	}
 
-	private boolean onPlot(Player p, String idTo) {
-		if(!idTo.equalsIgnoreCase("")){
-			Plot plot = PlotManager.getPlotById(p, idTo);
-			
-			if(plot != null)
-			{
+	private boolean onPlot(Player p, String id) {
+		if(!id.equalsIgnoreCase("")){
 				return true;
-			}
 		}
 		return false;
 	}
