@@ -1,4 +1,4 @@
-lang: fr
+lang: en
 messages:
   en:
     noplotworld: This is not a plot world
@@ -11,6 +11,7 @@ messages:
     notyourplot: This is not your plot
     nopermission: You don't have permission to use this command
     badtime: Time must be between 1 and 24000
+    belongto: This plot belong to
   fr:
     noplotworld: Ce n'est pas un Plotworld
     noplot: Vous n'etes pas sur un plot
@@ -22,3 +23,4 @@ messages:
     notyourplot: Ce n'est pas votre plot
     nopermission: Vous n'avez pas la permission d'utiliser cette commande
     badtime: L'heure doit etre comprise entre 1 et 24000
+    belongto: Ce plot appartient a

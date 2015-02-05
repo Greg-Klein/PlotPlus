@@ -3,6 +3,8 @@ package fr.mrkold.plotplus;
 import java.io.File;
 import java.io.IOException;
 
+import me.confuser.barapi.BarAPI;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
@@ -15,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -28,15 +31,19 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	private final ChatColor RED = ChatColor.RED;
 	private final ChatColor GREEN = ChatColor.GREEN;
 	private final ChatColor AQUA = ChatColor.AQUA;
-	private String lang = "";
+	private String lang;
     private File myFile;
+    private Location to;
+    private PluginDescriptionFile pdf = this.getDescription();						// recuperer les infos de plugin.yml
+    private String version = pdf.getVersion();
+	private String nomplugin = pdf.getName();
+	private Boolean BarAPIOK;
     
     // ---------------------------------
     
 	@Override
 	public void onDisable() 														// A la desactivation
 	{
-		PluginDescriptionFile pdf = this.getDescription(); 							// recuperer les infos de plugin.yml
 		getLogger().info(pdf.getName() + " v"+ pdf.getVersion() + " disabled");
 	}
 	
@@ -44,10 +51,10 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {														// A l'activation
-		PluginDescriptionFile pdf = this.getDescription(); 							// recuperer les infos de plugin.yml
-		saveDefaultConfig(); 														// ecrire le fichier de config par defaut
+		saveDefaultConfig();														// ecrire le fichier de config par defaut
+		lang = getConfig().getString("lang");
 		getServer().getPluginManager().registerEvents(this, this);
-		getLogger().info(pdf.getName() + " v"+ pdf.getVersion() + " enabled");
+		getLogger().info(nomplugin + " v"+ version + " enabled");
 		
         myFile = new File(getDataFolder(), "plots.yml");							// Creer le fichier plots.yml s'il n'existe pas
         if (!myFile.exists()) {
@@ -57,39 +64,49 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
                 e.printStackTrace();
             }
         }
+        
+        Plugin BarAPIPlugin = getServer().getPluginManager().getPlugin("BarAPI");
+		if((BarAPIPlugin != null) && BarAPIPlugin.isEnabled()){
+			BarAPIOK = true;
+			getLogger().info("Plugin 'BarAPI' found. Using it now.");
+		}
+		else{
+			BarAPIOK = false;
+		}
 	}
 	
 	// ---------------------------------
+	
+	public void ReloadPlugin(Player p) {
+		this.reloadConfig();
+		lang = getConfig().getString("lang");
+		p.sendMessage(AQUA + "[PlotPlus] Configuration reloaded");
+	}
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
 		
 		if((label.equalsIgnoreCase("pp"))||(label.equalsIgnoreCase("plotplus"))) { 						// On verifie que la commande est /pp ou /plotplus
-		    if(sender instanceof Player) { 																// On verifie que la commande est entree par le joueur
-		    	if(sender.hasPermission("plotplus.use")){
+		    if(sender instanceof Player) {																// On verifie que la commande est entree par le joueur
+		    	Player p = (Player) sender;
+		    	if(p.hasPermission("plotplus.use")){
 		    		if (args.length == 0) { 																// Si la commande n'a pas d'argument
-			    		PluginDescriptionFile pdf = this.getDescription();
-			    		String version = pdf.getVersion();
-			    		String nomplugin = pdf.getName();
-						sender.sendMessage(AQUA + "------------------------------");
-						sender.sendMessage(AQUA + nomplugin + " v" + version + " by MrKold");
-						sender.sendMessage(AQUA + "------------------------------");
-						sender.sendMessage(GREEN + "");
-						sender.sendMessage(AQUA + "Syntax:");
-						sender.sendMessage(GREEN + "Time: " + AQUA + "/pp ticks|resettime");
-						sender.sendMessage(GREEN + "Weather: " + AQUA + "/pp rain|resetweather");
-						sender.sendMessage(GREEN + "Reload: " + AQUA + "/pp reload");
+						p.sendMessage(AQUA + "------------------------------");
+						p.sendMessage(AQUA + nomplugin + " v" + version + " by MrKold");
+						p.sendMessage(AQUA + "------------------------------");
+						p.sendMessage(GREEN + "");
+						p.sendMessage(AQUA + "Syntax:");
+						p.sendMessage(GREEN + "Time: " + AQUA + "/pp ticks|resettime");
+						p.sendMessage(GREEN + "Weather: " + AQUA + "/pp rain|resetweather");
+						p.sendMessage(GREEN + "Reload: " + AQUA + "/pp reload");
 						return true;
 					}
 			    	else {
 			    		String a0 = args[0];
-			            Player p = (Player) sender;
-			            lang = getConfig().getString("lang");
 			            YamlConfiguration plots = YamlConfiguration.loadConfiguration(myFile);					// Chargement du fichier plots.yml
 			            
-			            if ((a0.equalsIgnoreCase("reload")) && (sender.hasPermission("plotplus.admin"))) {
-				    		reloadConfig();
-				    		sender.sendMessage(AQUA + "[PlotPlus] Configuration reloaded");
+			            if ((a0.equalsIgnoreCase("reload")) && (p.hasPermission("plotplus.admin"))) {
+			            	ReloadPlugin(p);
 				    		return true;
 						}
 			            
@@ -170,7 +187,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			    	}
 		    	}
 		    	else {
-		    		sender.sendMessage(RED + (getConfig().getString("messages."+ lang +".nopermission")));
+		    		p.sendMessage(RED + (getConfig().getString("messages."+ lang +".nopermission")));
 		    	}
 		    }
 		}
@@ -178,38 +195,50 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
-	public void onMove(PlayerMoveEvent evt)												// Lorsque le joueur bouge
-	{
-		Player p = evt.getPlayer();
-		File plotsFile = new File(this.getDataFolder(), "plots.yml");
-        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);		// Chargement du fichier plots.yml
-		
-			Location to = evt.getTo();
-			
+	private void onMove(PlayerMoveEvent evt){	// Lorsque le joueur bouge
+			Player p = evt.getPlayer();
+			File plotsFile = new File(this.getDataFolder(), "plots.yml");
+	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);		// Chargement du fichier plots.yml
+			to = evt.getTo();
 			String idTo = PlotManager.getPlotId(to);
 			
-			if(!idTo.equalsIgnoreCase(""))
-			{
+			if(onPlot(p, idTo)){															// On teste si l'on est sur un plot
 				Plot plot = PlotManager.getPlotById(p, idTo);
-				
-				if(plot != null)														// On teste si l'on est sur un plot
-				{
-					String plotid = plot.id;
-					String world = p.getWorld().getName();
-					int heure = plots.getInt("plots." + world + "." + plotid + ".time");				// Recuperation des donnees dans le fichier de configuration plots.yml
-					Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
-					if(heure != 0){
-						p.setPlayerTime(heure, false);
-					}																	// On applique les parametres
-					if(rain){
-						p.setPlayerWeather(WeatherType.DOWNFALL);
-					}
+				String plotid = plot.id;
+				String world = p.getWorld().getName();
+				int heure = plots.getInt("plots." + world + "." + plotid + ".time");				// Recuperation des donnees dans le fichier de configuration plots.yml
+				Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
+				if(heure != 0){
+					p.setPlayerTime(heure, false);
+				}																	// On applique les parametres
+				if(rain){
+					p.setPlayerWeather(WeatherType.DOWNFALL);
+				}
+				String owner = plot.owner;
+				if(BarAPIOK && (owner != null)){
+					BarAPI.setMessage(p, (getConfig().getString("messages."+ lang +".owner") + " " + owner));
 				}
 			}
 			else
 			{
+				if(BarAPIOK && (BarAPI.hasBar(p))){
+					BarAPI.removeBar(p);
+				}
 				p.resetPlayerTime();													// Reinitialisation des parametres
 				p.resetPlayerWeather();
 			}
 	}
+
+	private boolean onPlot(Player p, String idTo) {
+		if(!idTo.equalsIgnoreCase("")){
+			Plot plot = PlotManager.getPlotById(p, idTo);
+			
+			if(plot != null)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }
+
