@@ -50,6 +50,8 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {														// A l'activation
 		saveDefaultConfig();														// ecrire le fichier de config par defaut
+		this.getConfig().options().copyDefaults(true);
+		this.saveConfig();
 		lang = getConfig().getString("lang");
 		getServer().getPluginManager().registerEvents(this, this);
 		getLogger().info(nomplugin + " v"+ version + " enabled");
@@ -215,7 +217,8 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 
 					
 						if(BarAPIOK){
-							BarAPI.setMessage(p, (getConfig().getString("messages."+ lang +".owner") + " " + plot.owner));
+							String message= getConfig().getString("messages."+ lang +".plotowner") + " " + plot.owner;
+							BarAPI.setMessage(p, message);
 						}
 					
 				}
