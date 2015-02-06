@@ -102,7 +102,18 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						p.sendMessage(AQUA + "Syntax:");
 						p.sendMessage(GREEN + "Time: " + AQUA + "/pp ticks|resettime");
 						p.sendMessage(GREEN + "Weather: " + AQUA + "/pp rain|resetweather");
-						p.sendMessage(GREEN + "Reload: " + AQUA + "/pp reload");
+						if(p.hasPermission("plotplus.rate.set")){
+							p.sendMessage(AQUA + "------------------------------");
+							p.sendMessage(GREEN + "Rate plot: " + AQUA + "/pp rate XX (Where WW is an integer between 0 and 20)");
+							p.sendMessage(GREEN + "Unrate: " + AQUA + "/pp unrate");
+						}
+						if(p.hasPermission("plotplus.rate.view")){
+							p.sendMessage(GREEN + "Get infos about plot: " + AQUA + "/pp info");
+						}
+						if(p.hasPermission("plotplus.admin")){
+							p.sendMessage(AQUA + "------------------------------");
+							p.sendMessage(GREEN + "Reload: " + AQUA + "/pp reload");
+						}
 						return true;
 					}
 			    	else {
@@ -189,7 +200,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 											return true;
 			    		            		
 										}
-			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate")){
+			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
 			    		            		plots.set("plots." + world + "." + plotid + ".rate", null);
 			    		            		try {
 												plots.save(myFile);
@@ -199,6 +210,26 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 											}
 			    		            		p.sendMessage(GREEN + getConfig().getString("messages."+ lang +".notereset"));
 			    		            		return true;	
+										}
+			    		            	if ((a0.equalsIgnoreCase("info")) && p.hasPermission("plotplus.rate.view")){
+			    		            		String ratem = getConfig().getString("messages."+ lang +".rated") + " ";
+			    		            		String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
+			    							String note = (plots.getString("plots." + world + "." + plotid + ".rate"));
+			    							String owner = plot.owner;
+			    							owner = plotownerm + " " + owner;
+			    							if(note == null){
+			    								note = getConfig().getString("messages."+ lang +".notrated");
+			    							}
+			    							else{
+			    								note = ratem + note + "/20";
+			    							}
+			    							owner = ChatColor.translateAlternateColorCodes('&', owner);
+			    							note = ChatColor.translateAlternateColorCodes('&', note);
+			    							p.sendMessage(GREEN + "------------------------------");
+			    							p.sendMessage(GREEN + owner);
+			    							p.sendMessage(note);
+			    							p.sendMessage(GREEN + "------------------------------");
+			    		            		return true;
 										}
 			    		            	else {
 			    		            		int setheure;
@@ -268,14 +299,14 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 					if (BarAPIOK){
 						String message;
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
-						String ratem = getConfig().getString("messages."+ lang +".rated");
+						String ratem = getConfig().getString("messages."+ lang +".rated") + " ";
 						String note = (plots.getString("plots." + world + "." + plotid + ".rate"));
 						if((notationenabled) && p.hasPermission("plotplus.rate.view")){
 							if(note == null){
 								note = getConfig().getString("messages."+ lang +".notrated");
 							}
 							else{
-								note = ratem + " " + note + "/20";
+								note = ratem + note + "/20";
 							}
 							String ncmessage = plotownerm + " " + plot.owner + "&f - " + note;
 							message = ChatColor.translateAlternateColorCodes('&', ncmessage);
