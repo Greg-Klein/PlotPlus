@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import me.confuser.barapi.BarAPI;
+import fr.mrkold.plotplus.PPFunctions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.WeatherType;
@@ -27,24 +28,25 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	
 	// --- Definition des variables ---
 	
-	private final ChatColor RED = ChatColor.RED;
-	private final ChatColor GREEN = ChatColor.GREEN;
-	private final ChatColor AQUA = ChatColor.AQUA;
-	private String lang;
-    private File myFile;
-    private PluginDescriptionFile pdf = this.getDescription();						// recuperer les infos de plugin.yml
+	public final ChatColor RED = ChatColor.RED;
+	public final ChatColor GREEN = ChatColor.GREEN;
+	public final ChatColor AQUA = ChatColor.AQUA;
+	static String lang;
+    static File myFile;
+    private PluginDescriptionFile pdf = this.getDescription();						// récupérer les infos de plugin.yml
     private String version = pdf.getVersion();
 	private String nomplugin = pdf.getName();
 	private Boolean BarAPIOK;
 	private boolean notationenabled = getConfig().getBoolean("rate-plots");
-	private String a0 = "rain";
+	private String a0;
 	private String a1;
+	static FileConfiguration configfile;
 	
     
     // ---------------------------------
     
 	@Override
-	public void onDisable() 														// A la desactivation
+	public void onDisable() 														// A la désactivation
 	{
 		getLogger().info(pdf.getName() + " v"+ pdf.getVersion() + " disabled");
 	}
@@ -53,10 +55,11 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {														// A l'activation
-		saveDefaultConfig();														// ecrire le fichier de config par defaut
-		this.getConfig().options().copyDefaults(true);
-		this.saveConfig();
-		lang = getConfig().getString("lang");
+		saveDefaultConfig();
+		configfile = getConfig();
+		configfile.options().copyDefaults(true);
+		saveConfig();
+		lang = configfile.getString("lang");
 		getServer().getPluginManager().registerEvents(this, this);
 		getLogger().info(nomplugin + " v"+ version + " enabled");
 		
@@ -82,10 +85,10 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	// ---------------------------------
 	
 	public void ReloadPlugin(Player p) {
-		this.reloadConfig();
-		lang = getConfig().getString("lang");
+		reloadConfig();
 		p.sendMessage(AQUA + "[PlotPlus] Configuration reloaded");
 	}
+
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
@@ -121,7 +124,6 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			    		if (args.length == 2) {
 			    			a1 = args[1];
 			    		}
-			            YamlConfiguration plots = YamlConfiguration.loadConfiguration(myFile);					// Chargement du fichier plots.yml
 			            
 			            if ((a0.equalsIgnoreCase("reload")) && (p.hasPermission("plotplus.admin"))) {
 			            	ReloadPlugin(p);
@@ -143,116 +145,34 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 		    		            if(plot != null) {
 		    		            	String plotid = plot.id;
 		    		            	if ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin")){
-			    		            	if (a0.equalsIgnoreCase("resettime")) {											// Si l'argument est resettime
-			    		            		plots.set("plots." + world + "." + plotid + ".time", null);									// On supprime time dans le fichier plots.yml
-			    		            	    try {
-												plots.save(myFile);
-											} catch (IOException e) {
-												// catch block
-												e.printStackTrace();
-											}
-											p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".resettime")));
+			    		            	if (a0.equalsIgnoreCase("resettime")) {	
+			    		            		PPFunctions.resetTime(p, world, plotid);
 											return true;
 										}
 			    		            	if (a0.equalsIgnoreCase("rain")) {											// Si l'argument est rain
-			    		            		plots.set("plots." + world + "." + plotid + ".rain", true);								// On met rain a true dans le fichier plots.yml
-			    		            		try {
-			    		            			plots.save(myFile);
-			    		            		} catch (IOException e) {
-			    		            			// catch block
-			    		            			e.printStackTrace();
-			    		            		}
-			    		            		p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".setrain")));
+			    		            		PPFunctions.setRain(p, world, plotid);
 			    		            		return true;
 										}
 			    		            	if (a0.equalsIgnoreCase("resetweather")) {									// Si l'argument est resetweather
-			    		            		plots.set("plots." + world + "." + plotid + ".rain", null);								// On supprime rain dans le fichier plots.yml
-			    		            		try {
-												plots.save(myFile);
-											} catch (IOException e) {
-												// catch block
-												e.printStackTrace();
-											}
-											p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".resetweather")));
+			    		            		PPFunctions.resetWeather(p, world, plotid);
 											return true;
 										}
 			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
-			    		            		int note;
-			    		            		try {
-			    		            			note =  Integer.parseInt(a1);
-			    		            		}
-			    		            		catch (NumberFormatException nfe) {
-			    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".badargument")));	// Si l'argument ne correspond à rien on renvoi un message d'erreur
+			    		            		if(PPFunctions.ratePlot(p, world, plotid, a1) == -1){
 			    		            			return false;
 			    		            		}
-			    		            		if ((note < 0)||(note > 20)){
-			    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".badnotation")));
-			    		            			return false;
-			    		            		}
-			    		            		plots.set("plots." + world + "." + plotid + ".rate", note);						// On met la note dans le fichier plots.yml
-			    		            		try {
-												plots.save(myFile);
-											} catch (IOException e) {
-												// catch block
-												e.printStackTrace();
-											}
-											p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".noteset")) + ": " + note + "/20");
 											return true;
-			    		            		
 										}
 			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
-			    		            		plots.set("plots." + world + "." + plotid + ".rate", null);
-			    		            		try {
-												plots.save(myFile);
-											} catch (IOException e) {
-												// catch block
-												e.printStackTrace();
-											}
-			    		            		p.sendMessage(GREEN + getConfig().getString("messages."+ lang +".notereset"));
+			    		            		PPFunctions.unratePlot(p, world, plotid);
 			    		            		return true;	
 										}
 			    		            	if ((a0.equalsIgnoreCase("info")) && p.hasPermission("plotplus.rate.view")){
-			    		            		String ratem = getConfig().getString("messages."+ lang +".rated") + " ";
-			    		            		String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
-			    							String note = (plots.getString("plots." + world + "." + plotid + ".rate"));
-			    							String owner = plot.owner;
-			    							owner = plotownerm + " " + owner;
-			    							if(note == null){
-			    								note = getConfig().getString("messages."+ lang +".notrated");
-			    							}
-			    							else{
-			    								note = ratem + note + "/20";
-			    							}
-			    							owner = ChatColor.translateAlternateColorCodes('&', owner);
-			    							note = ChatColor.translateAlternateColorCodes('&', note);
-			    							p.sendMessage(GREEN + "------------------------------");
-			    							p.sendMessage(GREEN + owner);
-			    							p.sendMessage(note);
-			    							p.sendMessage(GREEN + "------------------------------");
+			    		            		PPFunctions.plotInfo(p, world, plotid);
 			    		            		return true;
 										}
 			    		            	else {
-			    		            		int setheure;
-			    		            		try {
-			    		            			setheure =  Integer.parseInt(a0);										// Recuperation de l'heure dans setheure depuis l'argument
-			    		            			if ((setheure <= 0)||(setheure > 24000)){
-			    		            				p.sendMessage(RED + (getConfig().getString("messages."+ lang +".badtime")));
-			    		            				return false;
-			    		            			}
-			    		            			plots.set("plots." + world + "." + plotid + ".time", setheure);						// On met l'heure à setheure dans le fichier plots.yml
-			    		            			try {
-													plots.save(myFile);
-												} catch (IOException e) {
-													// catch block
-													e.printStackTrace();
-												}
-											    p.sendMessage(GREEN + (getConfig().getString("messages."+ lang +".settime")) + ": " + setheure + "ticks");
-											    return true;
-			    		            		}
-			    		            		catch (NumberFormatException nfe) {
-			    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".badargument")));	// Si l'argument ne correspond à rien on renvoi un message d'erreur
-			    		            			return false;
-			    		            		}
+			    		            		PPFunctions.setHeure(p, world, plotid, a0);
 										}
 		    		            	}
 		    		            	else {
@@ -283,7 +203,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);		// Chargement du fichier plots.yml
 	        String id = PlotManager.getPlotId(p.getLocation());
 			
-			if(onPlot(p, id)){															// On teste si l'on est sur un plot
+			if(PPFunctions.onPlot(p, id)){															// On teste si l'on est sur un plot
 				Plot plot = PlotManager.getPlotById(p, id);
 				String world = p.getWorld().getName();
 				if(plot != null){
@@ -319,14 +239,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 					}
 				}
 				else{
-					String plotid = PlotManager.getPlotId(p.getLocation());
-					plots.set("plots." + world + "." + plotid, null);
-					try {
-						plots.save(myFile);
-					} catch (IOException e) {
-						// catch block
-						e.printStackTrace();
-					}
+					PPFunctions.clearPlotInfos(p);
 				}
 			}
 			else
@@ -337,13 +250,6 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 				p.resetPlayerTime();													// Reinitialisation des parametres
 				p.resetPlayerWeather();
 			}
-	}
-	
-	private boolean onPlot(Player p, String id) {
-		if(!id.equalsIgnoreCase("")){
-				return true;
-		}
-		return false;
 	}
 }
 
