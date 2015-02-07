@@ -15,10 +15,11 @@ messages:
     badtime: Time must be between 1 and 24000
     plotowner: 'Plot owner:'
     rated: '&2Rated'
-    noteset: You rated this plot
-    badnotation: Notation must be an integer between 0 and 20
+    noteset: You rated
+    badnotation: Notation must be an integer between 0 and 10
     notrated: '&cNot rated'
     notereset: Done
+    rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Where XX is an integer between 0 and 10)
     
   fr:
     noplotworld: Ce n'est pas un Plotworld
@@ -34,7 +35,8 @@ messages:
     badtime: L'heure doit etre comprise entre 1 et 24000
     plotowner: 'Ce plot appartient a:'
     rated: '&2Note'
-    noteset: Vous avez note ce plot
-    badnotation: La note doit être un entier entre 0 et 20
+    noteset: Vous avez note le
+    badnotation: La note doit être un entier entre 0 et 10
     notrated: '&cPas de note'
     notereset: Note réinitialisee
+    rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Où XX est un entier entre 0 et 10)

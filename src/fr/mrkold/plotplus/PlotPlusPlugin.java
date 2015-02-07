@@ -40,6 +40,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	private boolean notationenabled = getConfig().getBoolean("rate-plots");
 	private String a0;
 	private String a1;
+	private String a2;
 	static FileConfiguration configfile;
 	
     
@@ -124,6 +125,10 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			    		if (args.length == 2) {
 			    			a1 = args[1];
 			    		}
+			    		if (args.length == 3) {
+			    			a1 = args[1];
+			    			a2 = args[2];
+			    		}
 			            
 			            if ((a0.equalsIgnoreCase("reload")) && (p.hasPermission("plotplus.admin"))) {
 			            	ReloadPlugin(p);
@@ -158,16 +163,16 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 											return true;
 										}
 			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
-			    		            		if(PPFunctions.ratePlot(p, world, plotid, a1) == -1){
-			    		            			return false;
-			    		            		}
+			    		            		p.sendMessage("a1: " + a1);
+			    		            		p.sendMessage("a2: " + a2);
+			    		            		PPFunctions.ratePlot(p, world, plotid, a1, a2);
 											return true;
 										}
 			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
 			    		            		PPFunctions.unratePlot(p, world, plotid);
 			    		            		return true;	
 										}
-			    		            	if ((a0.equalsIgnoreCase("info")) && p.hasPermission("plotplus.rate.view")){
+			    		            	if (a0.equalsIgnoreCase("info")){
 			    		            		PPFunctions.plotInfo(p, world, plotid);
 			    		            		return true;
 										}
@@ -218,23 +223,42 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 					}
 					if (BarAPIOK){
 						String message;
+						String ncmessage;
+						String joueur = p.getName();
+						int note;
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
-						String ratem = getConfig().getString("messages."+ lang +".rated") + " ";
-						String note = (plots.getString("plots." + world + "." + plotid + ".rate"));
-						if((notationenabled) && p.hasPermission("plotplus.rate.view")){
-							if(note == null){
-								note = getConfig().getString("messages."+ lang +".notrated");
+						if(notationenabled){
+							if(p.hasPermission("plotplus.rate.view") || plot.owner.equalsIgnoreCase(joueur)){
+								String ratem = getConfig().getString("messages."+ lang +".rated") + " ";
+								String Sstyle = (plots.getString("plots." + world + "." + plotid + ".rate.style"));
+								String Sdetails = (plots.getString("plots." + world + "." + plotid + ".rate.details"));
+								String Spurpose = (plots.getString("plots." + world + "." + plotid + ".rate.purpose"));
+								String Satmosphere = (plots.getString("plots." + world + "." + plotid + ".rate.atmosphere"));
+								if((Sstyle==null)||(Sdetails==null)||(Spurpose==null)||(Satmosphere==null)){
+										ncmessage = plotownerm + " " + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
+								}
+								else{
+									try {
+										int style =  Integer.parseInt(Sstyle);
+										int details =  Integer.parseInt(Sdetails);
+										int purpose =  Integer.parseInt(Spurpose);
+										int atmosphere =  Integer.parseInt(Satmosphere);
+										note = style + details + purpose + atmosphere;
+										ncmessage = plotownerm + " " + plot.owner + "&f - " + ratem + note + "/40";
+									}
+									catch (NumberFormatException nfe) {
+										ncmessage = plotownerm + " " + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
+									}
+								}
 							}
 							else{
-								note = ratem + note + "/20";
+								ncmessage = plotownerm + " " + plot.owner;
 							}
-							String ncmessage = plotownerm + " " + plot.owner + "&f - " + note;
-							message = ChatColor.translateAlternateColorCodes('&', ncmessage);
 						}
 						else{
-							String ncmessage = plotownerm + ": " + plot.owner;
-							message = ChatColor.translateAlternateColorCodes('&', ncmessage);
+							ncmessage = plotownerm + " " + plot.owner;	
 						}
+						message = ChatColor.translateAlternateColorCodes('&', ncmessage);
 						BarAPI.setMessage(p, message);
 					}
 				}

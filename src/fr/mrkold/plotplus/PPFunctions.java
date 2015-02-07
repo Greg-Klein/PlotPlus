@@ -16,6 +16,7 @@ public class PPFunctions {
 	
 	private final static ChatColor RED = ChatColor.RED;
 	private final static ChatColor GREEN = ChatColor.GREEN;
+	private final static ChatColor AQUA = ChatColor.AQUA;
 	static YamlConfiguration plots = YamlConfiguration.loadConfiguration(PlotPlusPlugin.myFile);
 	static FileConfiguration configfile = PlotPlusPlugin.configfile;
 	static String lang = PlotPlusPlugin.lang;
@@ -61,23 +62,68 @@ public class PPFunctions {
 	}
 	
 	// ratePlot
-	public static int ratePlot(Player p, String world, String plotid, String a1) {
-		int note;
-		try {
-			note =  Integer.parseInt(a1);
+	public static boolean ratePlot(Player p, String world, String plotid, String a1, String a2) {
+		// Style
+		if(a1.equalsIgnoreCase("style")){
+			if(a2 == null){
+				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				return false;
+			}
+			else{
+				int style = testNote(p, a2);
+				plots.set("plots." + world + "." + plotid + ".rate.style", style);
+				savePlotConfig();
+				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " style: " + style + "/10");
+				return true;
+			}
 		}
-		catch (NumberFormatException nfe) {
-			p.sendMessage(RED + (configfile.getString("messages."+ lang +".badargument")));
-			return -1;
+		// Atmosphere
+		if(a1.equalsIgnoreCase("atmosphere")){
+			if(a2 == null){
+				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				return false;
+			}
+			else{
+				int atmosphere = testNote(p, a2);
+				plots.set("plots." + world + "." + plotid + ".rate.atmosphere", atmosphere);
+				savePlotConfig();
+				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " atmosphere: " + atmosphere + "/10");
+				return true;
+			}
 		}
-		if ((note < 0)||(note > 20)){
-			p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
-			return -1;
+		// Detail
+		if(a1.equalsIgnoreCase("details")){
+			if(a2 == null){
+				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				return false;
+			}
+			else{
+				int details = testNote(p, a2);
+				plots.set("plots." + world + "." + plotid + ".rate.details", details);
+				savePlotConfig();
+				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " details: " + details + "/10");
+				return true;
+			}
 		}
-		plots.set("plots." + world + "." + plotid + ".rate", note);						// On met la note dans le fichier plots.yml
-		savePlotConfig();
-		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + ": " + note + "/20");
-		return note;
+		// Purpose
+		if(a1.equalsIgnoreCase("purpose")){
+			if(a2 == null){
+				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				return false;
+			}
+			else{
+				int purpose = testNote(p, a2);
+				plots.set("plots." + world + "." + plotid + ".rate.purpose", purpose);
+				savePlotConfig();
+				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " purpose: " + purpose + "/10");
+				return true;
+			}
+		}
+		else{
+			p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".rateusage")));
+			return false;
+		}
+		
 	}
 	
 	//unratePlot
@@ -109,23 +155,35 @@ public class PPFunctions {
 	
 	//plotInfo
 	public static void plotInfo(Player p, String world, String plotid) {
-		String ratem = configfile.getString("messages."+ lang +".rated") + " ";
 		String plotownerm = configfile.getString("messages."+ lang +".plotowner");
-		String note = (plots.getString("plots." + world + "." + plotid + ".rate"));
 		Plot plot = PlotManager.getPlotById(p);
 		String owner = plot.owner;
-		owner = plotownerm + " " + owner;
-		if(note == null){
-			note = configfile.getString("messages."+ lang +".notrated");
+		String note;
+		owner = plotownerm + " " + AQUA + owner;
+
+		String Sstyle = (plots.getString("plots." + world + "." + plotid + ".rate.style"));
+		String Sdetails = (plots.getString("plots." + world + "." + plotid + ".rate.details"));
+		String Spurpose = (plots.getString("plots." + world + "." + plotid + ".rate.purpose"));
+		String Satmosphere = (plots.getString("plots." + world + "." + plotid + ".rate.atmosphere"));
+		try {
+			int style =  Integer.parseInt(Sstyle);
+			int details =  Integer.parseInt(Sdetails);
+			int purpose =  Integer.parseInt(Spurpose);
+			int atmosphere =  Integer.parseInt(Satmosphere);
+			String mstyle = GREEN+"Style: "+AQUA+style+"/10";
+			String mdetails = GREEN+"Details: "+AQUA+details+"/10";
+			String mpurpose = GREEN+"Purpose: "+AQUA+purpose+"/10";
+			String matmosphere = GREEN+"Atmosphere: "+AQUA+atmosphere+"/10";
+			note = mstyle + "\n" + mdetails + "\n" + mpurpose + "\n" + matmosphere;
 		}
-		else{
-			note = ratem + note + "/20";
+		catch (NumberFormatException nfe) {
+				note = configfile.getString("messages."+ lang +".notrated");
 		}
 		owner = ChatColor.translateAlternateColorCodes('&', owner);
 		note = ChatColor.translateAlternateColorCodes('&', note);
 		p.sendMessage(GREEN + "------------------------------");
 		p.sendMessage(GREEN + owner);
-		p.sendMessage(note);
+		p.sendMessage(GREEN + note);
 		p.sendMessage(GREEN + "------------------------------");
 	}
 	
@@ -135,6 +193,23 @@ public class PPFunctions {
 		String plotid = PlotManager.getPlotId(p.getLocation());
 		plots.set("plots." + world + "." + plotid, null);
 		savePlotConfig();
+	}
+	
+	// Test note between 0 and 10
+	private static int testNote(Player p, String a2){
+		int note;
+		try {
+			note =  Integer.parseInt(a2);
+		}
+		catch (NumberFormatException nfe) {
+			p.sendMessage(RED + (configfile.getString("messages."+ lang +".badargument")));
+			return 0;
+		}
+		if ((note < 0)||(note > 10)){
+			p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+			return 0;
+		}
+		return note;
 	}
 
 }
