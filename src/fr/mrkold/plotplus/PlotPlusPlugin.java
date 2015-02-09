@@ -37,6 +37,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
     private String version = pdf.getVersion();
 	private String nomplugin = pdf.getName();
 	private Boolean BarAPIOK;
+	public static Boolean PEXOK;
 	private boolean notationenabled = getConfig().getBoolean("rate-plots");
 	private String a0;
 	private String a1;
@@ -80,6 +81,14 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 		}
 		else{
 			BarAPIOK = false;
+		}
+		Plugin PEXPlugin = getServer().getPluginManager().getPlugin("PermissionsEx");
+		if((PEXPlugin != null) && PEXPlugin.isEnabled()){
+			PEXOK = true;
+			getLogger().info("Plugin 'PermissionsEx' found. Using it now.");
+		}
+		else{
+			PEXOK = false;
 		}
 	}
 	
@@ -225,6 +234,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						String message;
 						String ncmessage;
 						String joueur = p.getName();
+						String rank = PPFunctions.getRank(p, plot.owner);
 						int note;
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
 						if(notationenabled){
@@ -235,7 +245,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 								String Spurpose = (plots.getString("plots." + world + "." + plotid + ".rate.purpose"));
 								String Satmosphere = (plots.getString("plots." + world + "." + plotid + ".rate.atmosphere"));
 								if((Sstyle==null)||(Sdetails==null)||(Spurpose==null)||(Satmosphere==null)){
-										ncmessage = plotownerm + " " + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
+										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
 								}
 								else{
 									try {
@@ -244,19 +254,19 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 										int purpose =  Integer.parseInt(Spurpose);
 										int atmosphere =  Integer.parseInt(Satmosphere);
 										note = style + details + purpose + atmosphere;
-										ncmessage = plotownerm + " " + plot.owner + "&f - " + ratem + note + "/40";
+										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + ratem + note + "/40";
 									}
 									catch (NumberFormatException nfe) {
-										ncmessage = plotownerm + " " + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
+										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
 									}
 								}
 							}
 							else{
-								ncmessage = plotownerm + " " + plot.owner;
+								ncmessage = plotownerm + " " + rank + plot.owner;
 							}
 						}
 						else{
-							ncmessage = plotownerm + " " + plot.owner;	
+							ncmessage = plotownerm + " " + rank + plot.owner;	
 						}
 						message = ChatColor.translateAlternateColorCodes('&', ncmessage);
 						BarAPI.setMessage(p, message);

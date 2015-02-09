@@ -9,6 +9,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
 
@@ -211,5 +213,20 @@ public class PPFunctions {
 		}
 		return note;
 	}
+	
+	// getRank
+		public static String getRank(Player p, String owner) {
+			String rank;
+			if(PlotPlusPlugin.PEXOK){
+				rank = PermissionsEx.getUser(owner).getPrefix();
+				if(rank == ""){
+					rank = "";
+				}
+			}
+			else{
+				rank = "";
+			}
+			return rank;
+		}
 
 }
