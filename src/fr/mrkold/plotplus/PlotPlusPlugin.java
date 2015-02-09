@@ -2,6 +2,7 @@ package fr.mrkold.plotplus;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import me.confuser.barapi.BarAPI;
 import fr.mrkold.plotplus.PPFunctions;
@@ -172,8 +173,6 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 											return true;
 										}
 			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
-			    		            		p.sendMessage("a1: " + a1);
-			    		            		p.sendMessage("a2: " + a2);
 			    		            		PPFunctions.ratePlot(p, world, plotid, a1, a2);
 											return true;
 										}
@@ -235,7 +234,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						String ncmessage;
 						String joueur = p.getName();
 						String rank = PPFunctions.getRank(p, plot.owner);
-						int note;
+						double rawNote;
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
 						if(notationenabled){
 							if(p.hasPermission("plotplus.rate.view") || plot.owner.equalsIgnoreCase(joueur)){
@@ -249,12 +248,14 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 								}
 								else{
 									try {
-										int style =  Integer.parseInt(Sstyle);
-										int details =  Integer.parseInt(Sdetails);
-										int purpose =  Integer.parseInt(Spurpose);
-										int atmosphere =  Integer.parseInt(Satmosphere);
-										note = style + details + purpose + atmosphere;
-										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + ratem + note + "/40";
+										double style =  Double.parseDouble(Sstyle);
+										double details =  Double.parseDouble(Sdetails);
+										double purpose =  Double.parseDouble(Spurpose);
+										double atmosphere =  Double.parseDouble(Satmosphere);
+										rawNote = (style + details + purpose + atmosphere)/4;
+										DecimalFormat df = new DecimalFormat("########.##"); 
+										String note = df.format(rawNote); 
+										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + ratem + note + "/10";
 									}
 									catch (NumberFormatException nfe) {
 										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
