@@ -32,7 +32,7 @@ public class PPFunctions {
 		return false;
 	}
 	
-	// savePlotConfig
+	// save Plot Config
 	public static void savePlotConfig() {
 		try {
 			plots.save(PlotPlusPlugin.myFile);
@@ -42,28 +42,28 @@ public class PPFunctions {
 		}
 	}
 	
-	// resetTime
+	// reset Time
 	public static void resetTime(Player p, String world, String plotid) {
 		plots.set("plots." + world + "." + plotid + ".time", null);
 		savePlotConfig();
 		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".resettime")));
 	}
 	
-	// setRain
+	// set Rain
 	public static void setRain(Player p, String world, String plotid) {
 		plots.set("plots." + world + "." + plotid + ".rain", true);
 		savePlotConfig();
 		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".setrain")));
 	}
 	
-	// resetWeather
+	// reset Weather
 	public static void resetWeather(Player p, String world, String plotid) {
 		plots.set("plots." + world + "." + plotid + ".rain", null);	
 		savePlotConfig();
 		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".resetweather")));
 	}
 	
-	// ratePlot
+	// rate Plot
 	public static boolean ratePlot(Player p, String world, String plotid, String a1, String a2) {
 		// Style
 		if(a1.equalsIgnoreCase("style")){
@@ -128,14 +128,14 @@ public class PPFunctions {
 		
 	}
 	
-	//unratePlot
+	// unrate Plot
 	public static void unratePlot(Player p, String world, String plotid) {
 		plots.set("plots." + world + "." + plotid + ".rate", null);
 		savePlotConfig();
 		p.sendMessage(GREEN + configfile.getString("messages."+ lang +".notereset"));
 	}
 	
-	//setHeure
+	// set Heure
 	public static boolean setHeure(Player p, String world, String plotid, String a0) {
 		try {
 			int setheure;
@@ -155,7 +155,7 @@ public class PPFunctions {
 		}
 	}
 	
-	//plotInfo
+	// plot Info
 	public static void plotInfo(Player p, String world, String plotid) {
 		String plotownerm = configfile.getString("messages."+ lang +".plotowner");
 		Plot plot = PlotManager.getPlotById(p);
@@ -189,7 +189,7 @@ public class PPFunctions {
 		p.sendMessage(GREEN + "------------------------------");
 	}
 	
-	// clearPlot
+	// clear Plot Infos
 	public static void clearPlotInfos(Player p) {
 		String world = p.getWorld().getName();
 		String plotid = PlotManager.getPlotId(p.getLocation());
@@ -197,7 +197,7 @@ public class PPFunctions {
 		savePlotConfig();
 	}
 	
-	// Test note between 0 and 10
+	// Test if note is between 0 and 10
 	private static int testNote(Player p, String a2){
 		int note;
 		try {
@@ -214,12 +214,17 @@ public class PPFunctions {
 		return note;
 	}
 	
-	// getRank
+	// get Rank
 		public static String getRank(Player p, String owner) {
 			String rank;
 			if(PlotPlusPlugin.PEXOK){
-				rank = PermissionsEx.getUser(owner).getPrefix();
-				if(rank == ""){
+				try{
+					rank = PermissionsEx.getUser(owner).getPrefix();
+					if(rank == ""){
+						rank = "";
+					}
+				}
+				catch (NullPointerException e){
 					rank = "";
 				}
 			}

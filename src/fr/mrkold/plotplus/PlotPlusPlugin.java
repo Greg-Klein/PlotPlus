@@ -49,7 +49,8 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
     // ---------------------------------
     
 	@Override
-	public void onDisable() 														// A la désactivation
+	// A la désactivation
+	public void onDisable()
 	{
 		getLogger().info(pdf.getName() + " v"+ pdf.getVersion() + " disabled");
 	}
@@ -57,16 +58,21 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	// ---------------------------------
 	
 	@Override
-	public void onEnable() {														// A l'activation
+	// A l'activation
+	public void onEnable() {
+		getServer().getPluginManager().registerEvents(this, this);
+		// Sauvegarde de la configuration par defaut
 		saveDefaultConfig();
 		configfile = getConfig();
 		configfile.options().copyDefaults(true);
 		saveConfig();
+		// Recuperation de la langue
 		lang = configfile.getString("lang");
-		getServer().getPluginManager().registerEvents(this, this);
+
 		getLogger().info(nomplugin + " v"+ version + " enabled");
 		
-        myFile = new File(getDataFolder(), "plots.yml");							// Creer le fichier plots.yml s'il n'existe pas
+		// Créer le fichier plots.yml s'il n'existe pas
+        myFile = new File(getDataFolder(), "plots.yml");
         if (!myFile.exists()) {
             try {
                 myFile.createNewFile();
@@ -75,18 +81,21 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
             }
         }
         
+        // Détection de BarAPI
         Plugin BarAPIPlugin = getServer().getPluginManager().getPlugin("BarAPI");
 		if((BarAPIPlugin != null) && BarAPIPlugin.isEnabled()){
 			BarAPIOK = true;
-			getLogger().info("Plugin 'BarAPI' found. Using it now.");
+			getLogger().info("Plugin 'BarAPI' found.");
 		}
 		else{
 			BarAPIOK = false;
 		}
+		
+		// Détection de PermissionEX
 		Plugin PEXPlugin = getServer().getPluginManager().getPlugin("PermissionsEx");
 		if((PEXPlugin != null) && PEXPlugin.isEnabled()){
 			PEXOK = true;
-			getLogger().info("Plugin 'PermissionsEx' found. Using it now.");
+			getLogger().info("Plugin 'PermissionsEx' found.");
 		}
 		else{
 			PEXOK = false;
@@ -95,6 +104,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	
 	// ---------------------------------
 	
+	// Fonction de reload
 	public void ReloadPlugin(Player p) {
 		reloadConfig();
 		p.sendMessage(AQUA + "[PlotPlus] Configuration reloaded");
@@ -102,13 +112,17 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 
 	
 	@Override
+	// Lorsqu'une commande est entrée
 	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
 		
-		if((label.equalsIgnoreCase("pp"))||(label.equalsIgnoreCase("plotplus"))) { 						// On verifie que la commande est /pp ou /plotplus
-		    if(sender instanceof Player) {																// On verifie que la commande est entree par le joueur
+		// On vérifie que la commande est /pp ou /plotplus
+		if((label.equalsIgnoreCase("pp"))||(label.equalsIgnoreCase("plotplus"))) {
+			// On vérifie que la commande est entrée par un joueur
+		    if(sender instanceof Player) {
 		    	Player p = (Player) sender;
 		    	if(p.hasPermission("plotplus.use")){
-		    		if (args.length == 0) { 																// Si la commande n'a pas d'argument
+		    		// Si la commande n'a pas d'argument on affiche l'aide
+		    		if (args.length == 0) {
 						p.sendMessage(AQUA + "------------------------------");
 						p.sendMessage(AQUA + nomplugin + " v" + version + " by MrKold");
 						p.sendMessage(AQUA + "------------------------------");
@@ -130,69 +144,96 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						}
 						return true;
 					}
+		    		// Si la commande a un argument
 			    	else {
 			    		a0 = args[0];
+			    		// 2 arguments
 			    		if (args.length == 2) {
 			    			a1 = args[1];
 			    		}
+			    		// 3 arguments
 			    		if (args.length == 3) {
 			    			a1 = args[1];
 			    			a2 = args[2];
 			    		}
 			            
+			    		// Argument reload et permission ok
 			            if ((a0.equalsIgnoreCase("reload")) && (p.hasPermission("plotplus.admin"))) {
 			            	ReloadPlugin(p);
 				    		return true;
 						}
 			            
-			            if(PlotManager.getMap(p) == null) {															// Si la map n'est pas un plotworld
+			            // Détecte si l'on est bien sur un plotworld
+			            if(PlotManager.getMap(p) == null) {
 				            p.sendMessage(RED + (getConfig().getString("messages."+ lang +".noplotworld")));
 				        } else {
-				            String id = PlotManager.getPlotId(p);													// recuperer l'id du plot où se trouve le joueur
+				            String id = PlotManager.getPlotId(p);
 				            String world = p.getWorld().getName();
 				            
-				            if(id.equals("")) {																		// id == 0 : Ce n'est pas un plot
+				         // id == "" : Ce n'est pas un plot
+				            if(id.equals("")) {
 				                p.sendMessage(RED + (getConfig().getString("messages."+ lang +".noplot")));
-				            } else {	                
-		    		            Plot plot = PlotManager.getPlotById(p);												// recuperer les infos du plot
+				            } else {
+				            	// récupérer les infos du plot
+		    		            Plot plot = PlotManager.getPlotById(p);
 		    		            String joueur = p.getName();
 		    		            
+		    		            // Si plot != null alors le plot appartient à quelqu'un
 		    		            if(plot != null) {
 		    		            	String plotid = plot.id;
+		    		            	// Détecte si le plot appartient au joueur
 		    		            	if ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin")){
+		    		            		
+		    		            		// Commande resettime
 			    		            	if (a0.equalsIgnoreCase("resettime")) {	
 			    		            		PPFunctions.resetTime(p, world, plotid);
 											return true;
 										}
+			    		            	
+			    		            	// Commande rain
 			    		            	if (a0.equalsIgnoreCase("rain")) {											// Si l'argument est rain
 			    		            		PPFunctions.setRain(p, world, plotid);
 			    		            		return true;
 										}
+			    		            	
+			    		            	// Commande resetweather
 			    		            	if (a0.equalsIgnoreCase("resetweather")) {									// Si l'argument est resetweather
 			    		            		PPFunctions.resetWeather(p, world, plotid);
 											return true;
 										}
+			    		            	
+			    		            	// Commande rate
 			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
 			    		            		PPFunctions.ratePlot(p, world, plotid, a1, a2);
 											return true;
 										}
+			    		            	
+			    		            	// Commande unrate
 			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
 			    		            		PPFunctions.unratePlot(p, world, plotid);
 			    		            		return true;	
 										}
+			    		            	
+			    		            	// Commande info
 			    		            	if (a0.equalsIgnoreCase("info")){
 			    		            		PPFunctions.plotInfo(p, world, plotid);
 			    		            		return true;
 										}
+			    		            	
+			    		            	// Si aucune des commandes plus haut on définit l'heure grace à l'argument passé
 			    		            	else {
 			    		            		PPFunctions.setHeure(p, world, plotid, a0);
 										}
 		    		            	}
+		    		            	
+		    		            	// Si le plot n'appartient pas au joueur
 		    		            	else {
 			    		                p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notyourplot")));
 			    		                return false;
 			    		            }
 		    		            }
+		    		            
+		    		            // Si le plot n'appartient à personne
 		    		            else{
 		    		            	p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notowned")));
 		    		            	return false;
@@ -201,6 +242,8 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 				        }
 			    	}
 		    	}
+		    	
+		    	// Si le joueur n'a pas la permission
 		    	else {
 		    		p.sendMessage(RED + (getConfig().getString("messages."+ lang +".nopermission")));
 		    	}
@@ -210,62 +253,81 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	}
 	
 	@EventHandler(priority = EventPriority.HIGH)
-	private void onMove(PlayerMoveEvent evt){	// Lorsque le joueur bouge
+	// Lorsque le joueur bouge
+	private void onMove(PlayerMoveEvent evt){
 			Player p = evt.getPlayer();
+			// Chargement du fichier plots.yml
 			File plotsFile = new File(this.getDataFolder(), "plots.yml");
-	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);		// Chargement du fichier plots.yml
+	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);
 	        String id = PlotManager.getPlotId(p.getLocation());
 			
-			if(PPFunctions.onPlot(p, id)){															// On teste si l'on est sur un plot
+	     // On teste si l'on est sur un plot
+			if(PPFunctions.onPlot(p, id)){
 				Plot plot = PlotManager.getPlotById(p, id);
 				String world = p.getWorld().getName();
+				// Si le plot appartient à quelqu'un
 				if(plot != null){
 					String plotid = plot.id;
-					int heure = plots.getInt("plots." + world + "." + plotid + ".time");				// Recuperation des donnees dans le fichier de configuration plots.yml
+					// Récuperation des données dans le fichier de configuration plots.yml
+					int heure = plots.getInt("plots." + world + "." + plotid + ".time");
 					Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
+					// On applique les paramètres
 					if(heure != 0){
 						p.setPlayerTime(heure, false);
-					}																	// On applique les parametres
+					}
 					if(rain){
 						p.setPlayerWeather(WeatherType.DOWNFALL);
 					}
+					
+					// Si BarAPI est installé
 					if (BarAPIOK){
 						String message;
 						String ncmessage;
 						String joueur = p.getName();
-						String rank = PPFunctions.getRank(p, plot.owner);
+						String rank = PPFunctions.getRank(p, plot.owner); // On récupère le Préfix du joueur dans PermissionsEX
 						double rawNote;
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
+						
+						// Si la notation est activée
 						if(notationenabled){
+							// Si le joueur a la permission de voir la note des plots ou si le plot lui appartient
 							if(p.hasPermission("plotplus.rate.view") || plot.owner.equalsIgnoreCase(joueur)){
+								// On récupère les notes dans le fichier de configuration
 								String ratem = getConfig().getString("messages."+ lang +".rated") + " ";
 								String Sstyle = (plots.getString("plots." + world + "." + plotid + ".rate.style"));
 								String Sdetails = (plots.getString("plots." + world + "." + plotid + ".rate.details"));
 								String Spurpose = (plots.getString("plots." + world + "." + plotid + ".rate.purpose"));
 								String Satmosphere = (plots.getString("plots." + world + "." + plotid + ".rate.atmosphere"));
+								// Si le plot n'est pas noté
 								if((Sstyle==null)||(Sdetails==null)||(Spurpose==null)||(Satmosphere==null)){
 										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
 								}
+								// Si le plot a été noté dans les 4 domaines
 								else{
 									try {
+										// Conversion des notes en double
 										double style =  Double.parseDouble(Sstyle);
 										double details =  Double.parseDouble(Sdetails);
 										double purpose =  Double.parseDouble(Spurpose);
 										double atmosphere =  Double.parseDouble(Satmosphere);
+										// Calcul de la moyenne et formatage
 										rawNote = (style + details + purpose + atmosphere)/4;
 										DecimalFormat df = new DecimalFormat("########.##"); 
 										String note = df.format(rawNote); 
 										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + ratem + note + "/10";
 									}
+									// Si une des notes n'est pas un nombre on récupère l'erreur et on affiche le plot comme non noté
 									catch (NumberFormatException nfe) {
 										ncmessage = plotownerm + " " + rank + plot.owner + "&f - " + getConfig().getString("messages."+ lang +".notrated");
 									}
 								}
 							}
+							// Si le joueur n'a pas la permission de voir la note des plots ou si le plot ne lui appartient pas
 							else{
 								ncmessage = plotownerm + " " + rank + plot.owner;
 							}
 						}
+						// Si la notation n'est pas activée
 						else{
 							ncmessage = plotownerm + " " + rank + plot.owner;	
 						}
@@ -273,16 +335,21 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						BarAPI.setMessage(p, message);
 					}
 				}
+				
+				// Si le plot n'appartient à personne on efface les infos le concernant
 				else{
 					PPFunctions.clearPlotInfos(p);
 				}
 			}
+			
+			// Si l'on est pas sur un plot on rétablit les paramètres par défaut
 			else
 			{
+				// Si BarAPI est installé on masque la barre
 				if(BarAPIOK && (BarAPI.hasBar(p))){
 					BarAPI.removeBar(p);
 				}
-				p.resetPlayerTime();													// Reinitialisation des parametres
+				p.resetPlayerTime();
 				p.resetPlayerWeather();
 			}
 	}
