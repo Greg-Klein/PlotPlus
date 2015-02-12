@@ -3,7 +3,7 @@ main: fr.mrkold.plotplus.PlotPlusPlugin
 version: '1.7.3'
 author: MrKold
 depend: [PlotMe]
-softdepend: [BarAPI]
+softdepend: [BarAPI, PermissionsEx]
 description: Change time and weather on your plot
 commands:
     plotplus:

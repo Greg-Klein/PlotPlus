@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import fr.mrkold.plotplus.PlotPlusPlugin;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -216,20 +217,16 @@ public class PPFunctions {
 	
 	// get Rank
 		public static String getRank(Player p, String owner) {
-			String rank;
+			String rank = "";
 			if(PlotPlusPlugin.PEXOK){
 				try{
 					rank = PermissionsEx.getUser(owner).getPrefix();
-					if(rank == ""){
-						rank = "";
+					if(rank != ""){
+						return rank;
 					}
+				} catch (NullArgumentException e){
+					
 				}
-				catch (NullPointerException e){
-					rank = "";
-				}
-			}
-			else{
-				rank = "";
 			}
 			return rank;
 		}
