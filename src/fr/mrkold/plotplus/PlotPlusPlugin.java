@@ -320,9 +320,9 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
 						
 						// Si la vue de la notation est activée
-						if(viewrating && notationenabled){
+						if(notationenabled){
 							// Si le joueur a la permission de voir la note des plots ou si le plot lui appartient
-							if(p.hasPermission("plotplus.rate.view") || plot.owner.equalsIgnoreCase(joueur)){
+							if(p.hasPermission("plotplus.rate.view") || (plot.owner.equalsIgnoreCase(joueur) && viewrating)){
 								// On récupère les notes dans le fichier de configuration
 								String ratem = getConfig().getString("messages."+ lang +".rated") + " ";
 								String Sstyle = (plots.getString("plots." + world + "." + plotid + ".rate.style"));
