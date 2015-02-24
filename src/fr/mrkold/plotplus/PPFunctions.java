@@ -45,7 +45,11 @@ public class PPFunctions {
 	
 	// reset Time
 	public static void resetTime(Player p, String world, String plotid) {
+		String weather = (plots.getString("plots." + world + "." + plotid + ".rain"));
 		plots.set("plots." + world + "." + plotid + ".time", null);
+		if(weather == null){
+			plots.set("plots." + world + "." + plotid, null);
+		}
 		savePlotConfig();
 		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".resettime")));
 	}
@@ -59,7 +63,11 @@ public class PPFunctions {
 	
 	// reset Weather
 	public static void resetWeather(Player p, String world, String plotid) {
-		plots.set("plots." + world + "." + plotid + ".rain", null);	
+		String time = (plots.getString("plots." + world + "." + plotid + ".time"));
+		plots.set("plots." + world + "." + plotid + ".rain", null);
+		if(time == null){
+			plots.set("plots." + world + "." + plotid, null);
+		}
 		savePlotConfig();
 		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".resetweather")));
 	}
@@ -191,9 +199,9 @@ public class PPFunctions {
 	}
 	
 	// clear Plot Infos
-	public static void clearPlotInfos(Player p) {
+	public static void clearPlotInfos(Player p, String plotid) {
 		String world = p.getWorld().getName();
-		String plotid = PlotManager.getPlotId(p.getLocation());
+		p.sendMessage("test: " + world + " " + plotid);
 		plots.set("plots." + world + "." + plotid, null);
 		savePlotConfig();
 	}

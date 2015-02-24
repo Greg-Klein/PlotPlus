@@ -8,6 +8,7 @@ import me.confuser.barapi.BarAPI;
 import fr.mrkold.plotplus.PPFunctions;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -40,6 +41,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	private Boolean BarAPIOK;
 	public static Boolean PEXOK;
 	private boolean notationenabled = getConfig().getBoolean("rate-plots");
+	private boolean viewrating = getConfig().getBoolean("view-rating");
 	private String a0;
 	private String a1;
 	private String a2;
@@ -204,14 +206,28 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			    		            	
 			    		            	// Commande rate
 			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
-			    		            		PPFunctions.ratePlot(p, world, plotid, a1, a2);
-											return true;
+			    		            		// Si la notation est activée
+			    		            		if(notationenabled){
+			    		            			PPFunctions.ratePlot(p, world, plotid, a1, a2);
+												return true;
+			    		            		}
+			    		            		else{
+			    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notationdisabled")));
+			    		            			return false;
+			    		            		}
 										}
 			    		            	
 			    		            	// Commande unrate
 			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
-			    		            		PPFunctions.unratePlot(p, world, plotid);
-			    		            		return true;	
+			    		            		// Si la notation est activée
+			    		            		if(notationenabled){
+			    		            			PPFunctions.unratePlot(p, world, plotid);
+				    		            		return true;
+			    		            		}
+			    		            		else{
+			    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notationdisabled")));
+			    		            			return false;
+			    		            		}
 										}
 			    		            	
 			    		            	// Commande info
@@ -259,25 +275,40 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 			// Chargement du fichier plots.yml
 			File plotsFile = new File(this.getDataFolder(), "plots.yml");
 	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);
-	        String id = PlotManager.getPlotId(p.getLocation());
+	        Location moveFrom = evt.getFrom();
+			Location moveTo = evt.getTo();
+			String idTo = PlotManager.getPlotId(moveTo);
+	        String idFrom = PlotManager.getPlotId(moveFrom);
+	        Plot plot = PlotManager.getPlotById(p, idTo);
+	        String world = p.getWorld().getName();
+	        
+	     // Si l'on est sur un plot et qu'il appartient à quelqu'un
+	        if((PPFunctions.onPlot(p, idTo))&&(plot != null)){
+	        	String plotid = plot.id;
+	        	// Récuperation des données dans le fichier de configuration plots.yml
+				int heure = plots.getInt("plots." + world + "." + plotid + ".time");
+				Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
+				// On applique les paramètres
+				if(heure != 0){
+					p.setPlayerTime(heure, false);
+				}
+				else {
+					p.resetPlayerTime();
+				}
+				
+				if(rain){
+					p.setPlayerWeather(WeatherType.DOWNFALL);
+				}
+				else {
+					p.resetPlayerWeather();
+				}
+	        }
 			
-	     // On teste si l'on est sur un plot
-			if(PPFunctions.onPlot(p, id)){
-				Plot plot = PlotManager.getPlotById(p, id);
-				String world = p.getWorld().getName();
+	     // On teste si l'on entre sur un plot
+			if((!PPFunctions.onPlot(p, idFrom))&&(PPFunctions.onPlot(p, idTo))){
 				// Si le plot appartient à quelqu'un
 				if(plot != null){
 					String plotid = plot.id;
-					// Récuperation des données dans le fichier de configuration plots.yml
-					int heure = plots.getInt("plots." + world + "." + plotid + ".time");
-					Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
-					// On applique les paramètres
-					if(heure != 0){
-						p.setPlayerTime(heure, false);
-					}
-					if(rain){
-						p.setPlayerWeather(WeatherType.DOWNFALL);
-					}
 					
 					// Si BarAPI est installé
 					if (BarAPIOK){
@@ -288,8 +319,8 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						double rawNote;
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
 						
-						// Si la notation est activée
-						if(notationenabled){
+						// Si la vue de la notation est activée
+						if(viewrating && notationenabled){
 							// Si le joueur a la permission de voir la note des plots ou si le plot lui appartient
 							if(p.hasPermission("plotplus.rate.view") || plot.owner.equalsIgnoreCase(joueur)){
 								// On récupère les notes dans le fichier de configuration
@@ -335,16 +366,10 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						BarAPI.setMessage(p, message);
 					}
 				}
-				
-				// Si le plot n'appartient à personne on efface les infos le concernant
-				else{
-					PPFunctions.clearPlotInfos(p);
-				}
 			}
 			
-			// Si l'on est pas sur un plot on rétablit les paramètres par défaut
-			else
-			{
+			// Si l'on sort d'un plot on rétablit les paramètres par défaut
+			else if ((PPFunctions.onPlot(p, idFrom))&&(!PPFunctions.onPlot(p, idTo))) {
 				// Si BarAPI est installé on masque la barre
 				if(BarAPIOK && (BarAPI.hasBar(p))){
 					BarAPI.removeBar(p);
