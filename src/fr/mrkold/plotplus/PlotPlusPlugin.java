@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 
 import me.confuser.barapi.BarAPI;
 import fr.mrkold.plotplus.PPFunctions;
+import fr.mrkold.plotplus.UpdateChecker;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -42,6 +44,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	public static Boolean PEXOK;
 	private boolean notationenabled = getConfig().getBoolean("rate-plots");
 	private boolean viewrating = getConfig().getBoolean("view-rating");
+	private boolean checkupdates = getConfig().getBoolean("check-for-updates");
 	private String a0;
 	private String a1;
 	private String a2;
@@ -105,6 +108,18 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	}
 	
 	// ---------------------------------
+	
+	// A la connection
+		@EventHandler
+		public void onJoin(PlayerJoinEvent e){
+			Player p = e.getPlayer();
+			if(checkupdates && p.hasPermission("plotplus.admin")){
+				String udmsg = UpdateChecker.checkVersion(pdf);
+				if(!udmsg.equalsIgnoreCase("")){
+					e.getPlayer().sendMessage(udmsg);;
+				}
+			}
+		}
 	
 	// Fonction de reload
 	public void ReloadPlugin(Player p) {
