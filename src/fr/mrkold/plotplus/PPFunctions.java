@@ -4,23 +4,25 @@ import java.io.IOException;
 
 import fr.mrkold.plotplus.PlotPlusPlugin;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+
+import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
 
 public class PPFunctions {
 	
+	private PlotPlusPlugin plugin;
+	public PPFunctions(PlotPlusPlugin plugin){
+		this.plugin = plugin;
+	}
+	
 	private final static ChatColor RED = ChatColor.RED;
 	private final static ChatColor GREEN = ChatColor.GREEN;
 	private final static ChatColor AQUA = ChatColor.AQUA;
-	static YamlConfiguration plots = YamlConfiguration.loadConfiguration(PlotPlusPlugin.myFile);
-	static FileConfiguration configfile = PlotPlusPlugin.configfile;
-	static String lang = PlotPlusPlugin.lang;
-	
 	
 	// If on plot
 	public static boolean onPlot(Player p, String id) {
@@ -30,141 +32,149 @@ public class PPFunctions {
 		return false;
 	}
 	
-	// savePlotConfig
-	public static void savePlotConfig() {
+	// save Plot Config
+	public void savePlotConfig() {
 		try {
-			plots.save(PlotPlusPlugin.myFile);
+			plugin.plots.save(plugin.myFile);
 		} catch (IOException e) {
 			// catch block
 			e.printStackTrace();
 		}
 	}
 	
-	// resetTime
-	public static void resetTime(Player p, String world, String plotid) {
-		plots.set("plots." + world + "." + plotid + ".time", null);
+	// reset Time
+	public void resetTime(Player p, String world, String plotid) {
+		String weather = (plugin.plots.getString("plots." + world + "." + plotid + ".rain"));
+		plugin.plots.set("plots." + world + "." + plotid + ".time", null);
+		if(weather == null){
+			plugin.plots.set("plots." + world + "." + plotid, null);
+		}
 		savePlotConfig();
-		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".resettime")));
+		p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".resettime")));
 	}
 	
-	// setRain
-	public static void setRain(Player p, String world, String plotid) {
-		plots.set("plots." + world + "." + plotid + ".rain", true);
+	// set Rain
+	public void setRain(Player p, String world, String plotid) {
+		plugin.plots.set("plots." + world + "." + plotid + ".rain", true);
 		savePlotConfig();
-		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".setrain")));
+		p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".setrain")));
 	}
 	
-	// resetWeather
-	public static void resetWeather(Player p, String world, String plotid) {
-		plots.set("plots." + world + "." + plotid + ".rain", null);	
+	// reset Weather
+	public void resetWeather(Player p, String world, String plotid) {
+		String time = (plugin.plots.getString("plots." + world + "." + plotid + ".time"));
+		plugin.plots.set("plots." + world + "." + plotid + ".rain", null);
+		if(time == null){
+			plugin.plots.set("plots." + world + "." + plotid, null);
+		}
 		savePlotConfig();
-		p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".resetweather")));
+		p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".resetweather")));
 	}
 	
-	// ratePlot
-	public static boolean ratePlot(Player p, String world, String plotid, String a1, String a2) {
+	// rate Plot
+	public boolean ratePlot(Player p, String world, String plotid, String a1, String a2) {
 		// Style
 		if(a1.equalsIgnoreCase("style")){
 			if(a2 == null){
-				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				p.sendMessage((plugin.configfile.getString("messages."+ plugin.lang +".badnotation")));
 				return false;
 			}
 			else{
 				int style = testNote(p, a2);
-				plots.set("plots." + world + "." + plotid + ".rate.style", style);
+				plugin.plots.set("plots." + world + "." + plotid + ".rate.style", style);
 				savePlotConfig();
-				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " style: " + style + "/10");
+				p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".noteset")) + " style: " + style + "/10");
 				return true;
 			}
 		}
 		// Atmosphere
 		if(a1.equalsIgnoreCase("atmosphere")){
 			if(a2 == null){
-				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				p.sendMessage((plugin.configfile.getString("messages."+ plugin.lang +".badnotation")));
 				return false;
 			}
 			else{
 				int atmosphere = testNote(p, a2);
-				plots.set("plots." + world + "." + plotid + ".rate.atmosphere", atmosphere);
+				plugin.plots.set("plots." + world + "." + plotid + ".rate.atmosphere", atmosphere);
 				savePlotConfig();
-				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " atmosphere: " + atmosphere + "/10");
+				p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".noteset")) + " atmosphere: " + atmosphere + "/10");
 				return true;
 			}
 		}
 		// Detail
 		if(a1.equalsIgnoreCase("details")){
 			if(a2 == null){
-				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				p.sendMessage((plugin.configfile.getString("messages."+ plugin.lang +".badnotation")));
 				return false;
 			}
 			else{
 				int details = testNote(p, a2);
-				plots.set("plots." + world + "." + plotid + ".rate.details", details);
+				plugin.plots.set("plots." + world + "." + plotid + ".rate.details", details);
 				savePlotConfig();
-				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " details: " + details + "/10");
+				p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".noteset")) + " details: " + details + "/10");
 				return true;
 			}
 		}
 		// Purpose
 		if(a1.equalsIgnoreCase("purpose")){
 			if(a2 == null){
-				p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+				p.sendMessage((plugin.configfile.getString("messages."+ plugin.lang +".badnotation")));
 				return false;
 			}
 			else{
 				int purpose = testNote(p, a2);
-				plots.set("plots." + world + "." + plotid + ".rate.purpose", purpose);
+				plugin.plots.set("plots." + world + "." + plotid + ".rate.purpose", purpose);
 				savePlotConfig();
-				p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".noteset")) + " purpose: " + purpose + "/10");
+				p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".noteset")) + " purpose: " + purpose + "/10");
 				return true;
 			}
 		}
 		else{
-			p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".rateusage")));
+			p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".rateusage")));
 			return false;
 		}
 		
 	}
 	
-	//unratePlot
-	public static void unratePlot(Player p, String world, String plotid) {
-		plots.set("plots." + world + "." + plotid + ".rate", null);
+	// unrate Plot
+	public void unratePlot(Player p, String world, String plotid) {
+		plugin.plots.set("plots." + world + "." + plotid + ".rate", null);
 		savePlotConfig();
-		p.sendMessage(GREEN + configfile.getString("messages."+ lang +".notereset"));
+		p.sendMessage(GREEN + plugin.configfile.getString("messages."+ plugin.lang +".notereset"));
 	}
 	
-	//setHeure
-	public static boolean setHeure(Player p, String world, String plotid, String a0) {
+	// set Heure
+	public boolean setHeure(Player p, String world, String plotid, String a0) {
 		try {
 			int setheure;
 			setheure =  Integer.parseInt(a0);
 			if ((setheure <= 0)||(setheure > 24000)){
-				p.sendMessage(RED + (configfile.getString("messages."+ lang +".badtime")));
+				p.sendMessage(RED + (plugin.configfile.getString("messages."+ plugin.lang +".badtime")));
 				return false;
 			}
-			plots.set("plots." + world + "." + plotid + ".time", setheure);
+			plugin.plots.set("plots." + world + "." + plotid + ".time", setheure);
 			savePlotConfig();
-		    p.sendMessage(GREEN + (configfile.getString("messages."+ lang +".settime")) + ": " + setheure + "ticks");
+		    p.sendMessage(GREEN + (plugin.configfile.getString("messages."+ plugin.lang +".settime")) + ": " + setheure + "ticks");
 		    return true;
 		}
 		catch (NumberFormatException nfe) {
-			p.sendMessage(RED + (configfile.getString("messages."+ lang +".badargument")));
+			p.sendMessage(RED + (plugin.configfile.getString("messages."+ plugin.lang +".badargument")));
 			return false;
 		}
 	}
 	
-	//plotInfo
-	public static void plotInfo(Player p, String world, String plotid) {
-		String plotownerm = configfile.getString("messages."+ lang +".plotowner");
+	// plot Info
+	public void plotInfo(Player p, String world, String plotid) {
+		String plotownerm = plugin.configfile.getString("messages."+ plugin.lang +".plotowner");
 		Plot plot = PlotManager.getPlotById(p);
 		String owner = plot.owner;
 		String note;
 		owner = plotownerm + " " + AQUA + owner;
 
-		String Sstyle = (plots.getString("plots." + world + "." + plotid + ".rate.style"));
-		String Sdetails = (plots.getString("plots." + world + "." + plotid + ".rate.details"));
-		String Spurpose = (plots.getString("plots." + world + "." + plotid + ".rate.purpose"));
-		String Satmosphere = (plots.getString("plots." + world + "." + plotid + ".rate.atmosphere"));
+		String Sstyle = (plugin.plots.getString("plots." + world + "." + plotid + ".rate.style"));
+		String Sdetails = (plugin.plots.getString("plots." + world + "." + plotid + ".rate.details"));
+		String Spurpose = (plugin.plots.getString("plots." + world + "." + plotid + ".rate.purpose"));
+		String Satmosphere = (plugin.plots.getString("plots." + world + "." + plotid + ".rate.atmosphere"));
 		try {
 			int style =  Integer.parseInt(Sstyle);
 			int details =  Integer.parseInt(Sdetails);
@@ -177,7 +187,7 @@ public class PPFunctions {
 			note = mstyle + "\n" + mdetails + "\n" + mpurpose + "\n" + matmosphere;
 		}
 		catch (NumberFormatException nfe) {
-				note = configfile.getString("messages."+ lang +".notrated");
+				note = plugin.configfile.getString("messages."+ plugin.lang +".notrated");
 		}
 		owner = ChatColor.translateAlternateColorCodes('&', owner);
 		note = ChatColor.translateAlternateColorCodes('&', note);
@@ -187,29 +197,45 @@ public class PPFunctions {
 		p.sendMessage(GREEN + "------------------------------");
 	}
 	
-	// clearPlot
-	public static void clearPlotInfos(Player p) {
+	// clear Plot Infos
+	public void clearPlotInfos(Player p, String plotid) {
 		String world = p.getWorld().getName();
-		String plotid = PlotManager.getPlotId(p.getLocation());
-		plots.set("plots." + world + "." + plotid, null);
+		p.sendMessage("test: " + world + " " + plotid);
+		plugin.plots.set("plots." + world + "." + plotid, null);
 		savePlotConfig();
 	}
 	
-	// Test note between 0 and 10
-	private static int testNote(Player p, String a2){
+	// Test if note is between 0 and 10
+	private int testNote(Player p, String a2){
 		int note;
 		try {
 			note =  Integer.parseInt(a2);
 		}
 		catch (NumberFormatException nfe) {
-			p.sendMessage(RED + (configfile.getString("messages."+ lang +".badargument")));
+			p.sendMessage(RED + (plugin.configfile.getString("messages."+ plugin.lang +".badargument")));
 			return 0;
 		}
 		if ((note < 0)||(note > 10)){
-			p.sendMessage((configfile.getString("messages."+ PlotPlusPlugin.lang +".badnotation")));
+			p.sendMessage((plugin.configfile.getString("messages."+ plugin.lang +".badnotation")));
 			return 0;
 		}
 		return note;
 	}
+	
+	// get Rank
+		public String getRank(Player p, String owner) {
+			String rank = "";
+			if(plugin.PEXOK){
+				try{
+					rank = PermissionsEx.getUser(owner).getPrefix();
+					if(rank != ""){
+						return rank;
+					}
+				} catch (NullArgumentException e){
+					
+				}
+			}
+			return rank;
+		}
 
 }

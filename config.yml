@@ -1,5 +1,7 @@
+check-for-updates: true
 lang: en
 rate-plots: true
+view-rating: true
 messages:
   en:
     noplotworld: This is not a plot world
@@ -17,6 +19,7 @@ messages:
     rated: '&2Rated'
     noteset: You rated
     badnotation: Notation must be an integer between 0 and 10
+    notationdisabled: Rating disabled
     notrated: '&cNot rated'
     notereset: Done
     rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Where XX is an integer between 0 and 10)
@@ -37,6 +40,7 @@ messages:
     rated: '&2Note'
     noteset: Vous avez note le
     badnotation: La note doit être un entier entre 0 et 10
+    notationdisabled: Notation désactivée
     notrated: '&cPas de note'
     notereset: Note réinitialisee
     rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Où XX est un entier entre 0 et 10)
