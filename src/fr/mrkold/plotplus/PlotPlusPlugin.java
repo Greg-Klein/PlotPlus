@@ -11,8 +11,6 @@ import fr.mrkold.plotplus.UpdateChecker;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -32,23 +30,23 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	
 	// --- Definition des variables ---
 	
+	PPFunctions functions;
+	
 	public final ChatColor RED = ChatColor.RED;
 	public final ChatColor GREEN = ChatColor.GREEN;
 	public final ChatColor AQUA = ChatColor.AQUA;
-	static String lang;
-    static File myFile;
+	public String lang;
+    public File myFile;
     private PluginDescriptionFile pdf = this.getDescription();						// récupérer les infos de plugin.yml
-    private String version = pdf.getVersion();
-	private String nomplugin = pdf.getName();
+    public String version = pdf.getVersion();
+	public String nomplugin = pdf.getName();
 	private Boolean BarAPIOK;
-	public static Boolean PEXOK;
-	private boolean notationenabled = getConfig().getBoolean("rate-plots");
+	public Boolean PEXOK;
+	boolean notationenabled = getConfig().getBoolean("rate-plots");
 	private boolean viewrating = getConfig().getBoolean("view-rating");
 	private boolean checkupdates = getConfig().getBoolean("check-for-updates");
-	private String a0;
-	private String a1;
-	private String a2;
-	static FileConfiguration configfile;
+	public FileConfiguration configfile;
+	public YamlConfiguration plots;
 	
     
     // ---------------------------------
@@ -65,6 +63,8 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	@Override
 	// A l'activation
 	public void onEnable() {
+		getCommand("plotplus").setExecutor(new PPCommands(this));
+		
 		getServer().getPluginManager().registerEvents(this, this);
 		// Sauvegarde de la configuration par defaut
 		saveDefaultConfig();
@@ -85,6 +85,9 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
                 e.printStackTrace();
             }
         }
+        plots = YamlConfiguration.loadConfiguration(myFile);
+        
+        functions = new PPFunctions(this);
         
         // Détection de BarAPI
         Plugin BarAPIPlugin = getServer().getPluginManager().getPlugin("BarAPI");
@@ -128,160 +131,9 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 	}
 
 	
-	@Override
+	//
 	// Lorsqu'une commande est entrée
-	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
-		
-		// On vérifie que la commande est /pp ou /plotplus
-		if((label.equalsIgnoreCase("pp"))||(label.equalsIgnoreCase("plotplus"))) {
-			// On vérifie que la commande est entrée par un joueur
-		    if(sender instanceof Player) {
-		    	Player p = (Player) sender;
-		    	if(p.hasPermission("plotplus.use")){
-		    		// Si la commande n'a pas d'argument on affiche l'aide
-		    		if (args.length == 0) {
-						p.sendMessage(AQUA + "------------------------------");
-						p.sendMessage(AQUA + nomplugin + " v" + version + " by MrKold");
-						p.sendMessage(AQUA + "------------------------------");
-						p.sendMessage(GREEN + "");
-						p.sendMessage(AQUA + "Syntax:");
-						p.sendMessage(GREEN + "Time: " + AQUA + "/pp ticks|resettime");
-						p.sendMessage(GREEN + "Weather: " + AQUA + "/pp rain|resetweather");
-						if(p.hasPermission("plotplus.rate.set")){
-							p.sendMessage(AQUA + "------------------------------");
-							p.sendMessage(GREEN + "Rate plot: " + AQUA + "/pp rate XX (Where WW is an integer between 0 and 20)");
-							p.sendMessage(GREEN + "Unrate: " + AQUA + "/pp unrate");
-						}
-						if(p.hasPermission("plotplus.rate.view")){
-							p.sendMessage(GREEN + "Get infos about plot: " + AQUA + "/pp info");
-						}
-						if(p.hasPermission("plotplus.admin")){
-							p.sendMessage(AQUA + "------------------------------");
-							p.sendMessage(GREEN + "Reload: " + AQUA + "/pp reload");
-						}
-						return true;
-					}
-		    		// Si la commande a un argument
-			    	else {
-			    		a0 = args[0];
-			    		// 2 arguments
-			    		if (args.length == 2) {
-			    			a1 = args[1];
-			    		}
-			    		// 3 arguments
-			    		if (args.length == 3) {
-			    			a1 = args[1];
-			    			a2 = args[2];
-			    		}
-			            
-			    		// Argument reload et permission ok
-			            if ((a0.equalsIgnoreCase("reload")) && (p.hasPermission("plotplus.admin"))) {
-			            	ReloadPlugin(p);
-				    		return true;
-						}
-			            
-			            // Détecte si l'on est bien sur un plotworld
-			            if(PlotManager.getMap(p) == null) {
-				            p.sendMessage(RED + (getConfig().getString("messages."+ lang +".noplotworld")));
-				        } else {
-				            String id = PlotManager.getPlotId(p);
-				            String world = p.getWorld().getName();
-				            
-				         // id == "" : Ce n'est pas un plot
-				            if(id.equals("")) {
-				                p.sendMessage(RED + (getConfig().getString("messages."+ lang +".noplot")));
-				            } else {
-				            	// récupérer les infos du plot
-		    		            Plot plot = PlotManager.getPlotById(p);
-		    		            String joueur = p.getName();
-		    		            
-		    		            // Si plot != null alors le plot appartient à quelqu'un
-		    		            if(plot != null) {
-		    		            	String plotid = plot.id;
-		    		            	// Détecte si le plot appartient au joueur
-		    		            	if ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin")){
-		    		            		
-		    		            		// Commande resettime
-			    		            	if (a0.equalsIgnoreCase("resettime")) {	
-			    		            		PPFunctions.resetTime(p, world, plotid);
-											return true;
-										}
-			    		            	
-			    		            	// Commande rain
-			    		            	if (a0.equalsIgnoreCase("rain")) {											// Si l'argument est rain
-			    		            		PPFunctions.setRain(p, world, plotid);
-			    		            		return true;
-										}
-			    		            	
-			    		            	// Commande resetweather
-			    		            	if (a0.equalsIgnoreCase("resetweather")) {									// Si l'argument est resetweather
-			    		            		PPFunctions.resetWeather(p, world, plotid);
-											return true;
-										}
-			    		            	
-			    		            	// Commande rate
-			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
-			    		            		// Si la notation est activée
-			    		            		if(notationenabled){
-			    		            			PPFunctions.ratePlot(p, world, plotid, a1, a2);
-												return true;
-			    		            		}
-			    		            		else{
-			    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notationdisabled")));
-			    		            			return false;
-			    		            		}
-										}
-			    		            	
-			    		            	// Commande unrate
-			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
-			    		            		// Si la notation est activée
-			    		            		if(notationenabled){
-			    		            			PPFunctions.unratePlot(p, world, plotid);
-				    		            		return true;
-			    		            		}
-			    		            		else{
-			    		            			p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notationdisabled")));
-			    		            			return false;
-			    		            		}
-										}
-			    		            	
-			    		            	// Commande info
-			    		            	if (a0.equalsIgnoreCase("info")){
-			    		            		PPFunctions.plotInfo(p, world, plotid);
-			    		            		return true;
-										}
-			    		            	
-			    		            	// Si aucune des commandes plus haut on définit l'heure grace à l'argument passé
-			    		            	else {
-			    		            		PPFunctions.setHeure(p, world, plotid, a0);
-										}
-		    		            	}
-		    		            	
-		    		            	// Si le plot n'appartient pas au joueur
-		    		            	else {
-			    		                p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notyourplot")));
-			    		                return false;
-			    		            }
-		    		            }
-		    		            
-		    		            // Si le plot n'appartient à personne
-		    		            else{
-		    		            	p.sendMessage(RED + (getConfig().getString("messages."+ lang +".notowned")));
-		    		            	return false;
-		    		            }
-				            }
-				        }
-			    	}
-		    	}
-		    	
-		    	// Si le joueur n'a pas la permission
-		    	else {
-		    		p.sendMessage(RED + (getConfig().getString("messages."+ lang +".nopermission")));
-		    	}
-		    }
-		}
-		return false;
-	}
+	//
 	
 	@EventHandler(priority = EventPriority.HIGH)
 	// Lorsque le joueur bouge
@@ -330,7 +182,7 @@ public class PlotPlusPlugin extends JavaPlugin implements Listener {
 						String message;
 						String ncmessage;
 						String joueur = p.getName();
-						String rank = PPFunctions.getRank(p, plot.owner); // On récupère le Préfix du joueur dans PermissionsEX
+						String rank = functions.getRank(p, plot.owner); // On récupère le Préfix du joueur dans PermissionsEX
 						double rawNote;
 						String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
 						

@@ -8,3 +8,4 @@ description: Change time and weather on your plot
 commands:
     plotplus:
       aliases: [pp]
+      description: /pp rain | /pp <ticks> | /pp resettime | /pp resetweather
