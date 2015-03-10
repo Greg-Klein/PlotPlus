@@ -1,7 +1,7 @@
 check-for-updates: true
-lang: en
+enable-BarAPI: true
 rate-plots: true
-view-rating: true
+lang: en
 messages:
   en:
     noplotworld: This is not a plot world
@@ -17,8 +17,8 @@ messages:
     badtime: Time must be between 1 and 24000
     plotowner: 'Plot owner:'
     rated: '&2Rated'
-    noteset: You rated
-    badnotation: Notation must be an integer between 0 and 10
+    noteset: You rated this plot
+    badnotation: Notation must be an integer between 0 and 20
     notationdisabled: Rating disabled
     notrated: '&cNot rated'
     notereset: Done
@@ -30,7 +30,7 @@ messages:
     notowned: Ce plot n'a pas de propriétaire
     resettime: Heure reinitialisee sur le plot
     resetweather: Meteo reinitialisee sur le plot
-    setrain: Pluie programmee plot
+    setrain: Pluie programmee sur le plot
     settime: Heure definie sur le plot
     badargument: Mauvais argument. /pp pour voir la syntaxe
     notyourplot: Ce n'est pas votre plot
@@ -38,8 +38,8 @@ messages:
     badtime: L'heure doit etre comprise entre 1 et 24000
     plotowner: 'Ce plot appartient a:'
     rated: '&2Note'
-    noteset: Vous avez note le
-    badnotation: La note doit être un entier entre 0 et 10
+    noteset: Vous avez note le plot
+    badnotation: La note doit être un entier entre 0 et 20
     notationdisabled: Notation désactivée
     notrated: '&cPas de note'
     notereset: Note réinitialisee

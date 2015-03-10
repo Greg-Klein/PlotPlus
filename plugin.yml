@@ -1,6 +1,6 @@
 name: PlotPlus
-main: fr.mrkold.plotplus.PlotPlusPlugin
-version: 1.7.5
+main: fr.mrkold.plotplus.MainClass
+version: 2.0.0
 author: MrKold
 depend: [PlotMe]
 softdepend: [BarAPI, PermissionsEx]
@@ -8,4 +8,4 @@ description: Change time and weather on your plot
 commands:
     plotplus:
       aliases: [pp]
-      description: /pp rain | /pp <ticks> | /pp resettime | /pp resetweather
+      description: Usage /pp weather rain | /pp time set <ticks> | /pp time reset | /pp weather reset

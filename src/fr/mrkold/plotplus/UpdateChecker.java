@@ -45,7 +45,7 @@ public class UpdateChecker {
     public static String checkVersion(PluginDescriptionFile pdfFile){
     	
     	VersionNumber currentVersion = new VersionNumber(pdfFile.getVersion());
-    	List<String> versionURL = readURL("http://www.mrkold.fr/pluginsversions/plotplus.txt");
+    	List<String> versionURL = readURL("http://www.mrkold.fr/pluginsversions/plotplus2.txt");
     	String lVersion = versionURL.get(0) + "." + versionURL.get(1) + "." + versionURL.get(2);
     	VersionNumber latestVersion = new VersionNumber(lVersion);
     	int cv0 = currentVersion.version[0];

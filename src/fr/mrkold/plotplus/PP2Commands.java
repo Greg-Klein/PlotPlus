@@ -9,14 +9,14 @@ import org.bukkit.entity.Player;
 import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
 
+public class PP2Commands implements CommandExecutor {
+	
+	public MainClass plugin;
 
-public class PPCommands implements CommandExecutor {
-	
-	private PlotPlusPlugin plugin;
-	public PPCommands(PlotPlusPlugin plugin){
-		this.plugin = plugin;
+	public PP2Commands(MainClass mainClass) {
+		this.plugin = mainClass;
 	}
-	
+
 	private String a0;
 	private String a1;
 	private String a2;
@@ -29,29 +29,13 @@ public class PPCommands implements CommandExecutor {
 			// On vérifie que la commande est entrée par un joueur
 		    if(sender instanceof Player) {
 		    	Player p = (Player) sender;
-		    	if(p.hasPermission("plotplus.use")){
+		    	if(p.hasPermission("plotplus.use") || p.hasPermission("plotplus.admin")){
 		    		// Si la commande n'a pas d'argument on affiche l'aide
 		    		if (args.length == 0) {
 						p.sendMessage(ChatColor.AQUA + "------------------------------");
 						p.sendMessage(ChatColor.AQUA + plugin.nomplugin + " v" + plugin.version + " by MrKold");
+						p.sendMessage(ChatColor.AQUA + "'/help plotplus' for help");
 						p.sendMessage(ChatColor.AQUA + "------------------------------");
-						p.sendMessage(ChatColor.GREEN + "");
-						p.sendMessage(ChatColor.AQUA + "Syntax:");
-						p.sendMessage(ChatColor.GREEN + "Time: " + ChatColor.AQUA + "/pp ticks|resettime");
-						p.sendMessage(ChatColor.GREEN + "Weather: " + ChatColor.AQUA + "/pp rain|resetweather");
-						if(p.hasPermission("plotplus.rate.set")){
-							p.sendMessage(ChatColor.AQUA + "------------------------------");
-							p.sendMessage(ChatColor.GREEN + "Rate plot: " + ChatColor.AQUA + "/pp rate XX (Where XX is an integer between 0 and 20)");
-							p.sendMessage(ChatColor.GREEN + "Unrate: " + ChatColor.AQUA + "/pp unrate");
-						}
-						if(p.hasPermission("plotplus.rate.view")){
-							p.sendMessage(ChatColor.GREEN + "Get infos about plot: " + ChatColor.AQUA + "/pp info");
-						}
-						if(p.hasPermission("plotplus.admin")){
-							p.sendMessage(ChatColor.AQUA + "------------------------------");
-							p.sendMessage(ChatColor.GREEN + "Reload: " + ChatColor.AQUA + "/pp reload");
-						}
-						return true;
 					}
 		    		// Si la commande a un argument
 			    	else {
@@ -67,9 +51,14 @@ public class PPCommands implements CommandExecutor {
 			    		}
 			            
 			    		// Argument reload et permission ok
-			            if ((a0.equalsIgnoreCase("reload")) && (p.hasPermission("plotplus.admin"))) {
-			            	plugin.ReloadPlugin(p);
-				    		return true;
+			            if (a0.equalsIgnoreCase("reload")) {
+			            	if(p.hasPermission("plotplus.admin")){
+			            		plugin.ReloadPlugin(p);
+				            	return true;
+			            	}
+			            	else{
+			            		p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nopermission")));
+			            	}
 						}
 			            
 			            // Détecte si l'on est bien sur un plotworld
@@ -93,30 +82,46 @@ public class PPCommands implements CommandExecutor {
 		    		            	// Détecte si le plot appartient au joueur
 		    		            	if ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin")){
 		    		            		
-		    		            		// Commande resettime
-			    		            	if (a0.equalsIgnoreCase("resettime")) {	
-			    		            		plugin.functions.resetTime(p, world, plotid);
-											return true;
+		    		            		// Commande time
+			    		            	if (a0.equalsIgnoreCase("time")) {
+			    		            		if(args.length != 1){
+			    		            			if(a1.equalsIgnoreCase("reset")){
+				    		            			plugin.fonctions.resetTime(p, world, plotid);
+				    		            		}
+				    		            		if(a1.equalsIgnoreCase("set")){
+				    		            			if(a2 != null){
+				    		            				plugin.fonctions.setHeure(p, world, plotid, a2);
+				    		            			}
+				    		            			else{
+				    		            				p.sendMessage(ChatColor.RED + "/pp time set <ticks>");
+				    		            			}
+				    		            		}
+			    		            		}
+			    		            		else{
+			    		            			p.sendMessage(ChatColor.RED + "/pp time set <ticks> | /pp time reset");
+			    		            		}
 										}
 			    		            	
-			    		            	// Commande rain
-			    		            	if (a0.equalsIgnoreCase("rain")) {
-			    		            		p.sendMessage("DEBUG");
-			    		            		plugin.functions.setRain(p, world, plotid);
-			    		            		return true;
-										}
-			    		            	
-			    		            	// Commande resetweather
-			    		            	if (a0.equalsIgnoreCase("resetweather")) {									// Si l'argument est resetweather
-			    		            		plugin.functions.resetWeather(p, world, plotid);
-											return true;
+			    		            	// Commande weather
+			    		            	if (a0.equalsIgnoreCase("weather")) {
+			    		            		if(args.length != 1){
+			    		            			if(a1.equalsIgnoreCase("rain")){
+				    		            			plugin.fonctions.setRain(p, world, plotid);
+				    		            		}
+				    		            		if(a1.equalsIgnoreCase("reset")){
+				    		            			plugin.fonctions.resetWeather(p, world, plotid);
+				    		            		}
+			    		            		}
+			    		            		else{
+			    		            			p.sendMessage(ChatColor.RED + "/pp weather rain | /pp weather reset");
+			    		            		}
 										}
 			    		            	
 			    		            	// Commande rate
 			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
 			    		            		// Si la notation est activée
 			    		            		if(plugin.notationenabled){
-			    		            			plugin.functions.ratePlot(p, world, plotid, a1, a2);
+			    		            			plugin.fonctions.ratePlot(p, world, plotid, a1);
 												return true;
 			    		            		}
 			    		            		else{
@@ -129,7 +134,7 @@ public class PPCommands implements CommandExecutor {
 			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
 			    		            		// Si la notation est activée
 			    		            		if(plugin.notationenabled){
-			    		            			plugin.functions.unratePlot(p, world, plotid);
+			    		            			plugin.fonctions.unratePlot(p, world, plotid);
 				    		            		return true;
 			    		            		}
 			    		            		else{
@@ -140,27 +145,20 @@ public class PPCommands implements CommandExecutor {
 			    		            	
 			    		            	// Commande info
 			    		            	if (a0.equalsIgnoreCase("info")){
-			    		            		plugin.functions.plotInfo(p, world, plotid);
+			    		            		plugin.fonctions.plotInfo(p, world, plotid);
 			    		            		return true;
-										}
-			    		            	
-			    		            	// Si aucune des commandes plus haut on définit l'heure grace à l'argument passé
-			    		            	else {
-			    		            		plugin.functions.setHeure(p, world, plotid, a0);
 										}
 		    		            	}
 		    		            	
 		    		            	// Si le plot n'appartient pas au joueur
 		    		            	else {
 			    		                p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".notyourplot")));
-			    		                return false;
 			    		            }
 		    		            }
 		    		            
 		    		            // Si le plot n'appartient à personne
 		    		            else{
 		    		            	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".notowned")));
-		    		            	return false;
 		    		            }
 				            }
 				        }
