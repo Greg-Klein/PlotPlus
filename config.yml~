@@ -45,4 +45,3 @@ messages:
     notrated: '&cPas de note'
     notereset: Note réinitialisee
     rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Où XX est un entier entre 0 et 10)
-    likeplot: You like this plot

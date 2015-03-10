@@ -154,6 +154,8 @@ public class PP2Functions {
 			Plot plot = PlotManager.getPlotById(p);
 			String owner = plot.owner;
 			owner = plotownerm + " " + ChatColor.AQUA + owner;
+			int Inblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
+			String nblike =  ChatColor.AQUA + "" + Inblike + ChatColor.GREEN + "like(s)";
 			String mnote;
 
 			String Snote = (plugin.plots.getString("plots." + world + "." + plotid + ".rate"));
@@ -169,10 +171,20 @@ public class PP2Functions {
 			}
 			owner = ChatColor.translateAlternateColorCodes('&', owner);
 			mnote = ChatColor.translateAlternateColorCodes('&', mnote);
+			
 			p.sendMessage(ChatColor.GREEN + "------------------------------");
 			p.sendMessage(ChatColor.GREEN + owner);
 			p.sendMessage(ChatColor.GREEN + mnote);
+			p.sendMessage(ChatColor.GREEN + nblike);
 			p.sendMessage(ChatColor.GREEN + "------------------------------");
 		}
+		
+		// like Plot
+				public void plotLike(Player p, String world, String plotid) {
+					int nblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
+					nblike++;
+					plugin.plots.set("plots." + world + "." + plotid + ".like", nblike);
+					p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".likeplot"));
+				}
 
 }

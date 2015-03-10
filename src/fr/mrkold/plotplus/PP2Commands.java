@@ -24,9 +24,9 @@ public class PP2Commands implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
 		
-		// On vérifie que la commande est /pp ou /plotplus
+		// On verifie que la commande est /pp ou /plotplus
 		if((label.equalsIgnoreCase("pp"))||(label.equalsIgnoreCase("plotplus"))) {
-			// On vérifie que la commande est entrée par un joueur
+			// On verifie que la commande est entree par un joueur
 		    if(sender instanceof Player) {
 		    	Player p = (Player) sender;
 		    	if(p.hasPermission("plotplus.use") || p.hasPermission("plotplus.admin")){
@@ -61,7 +61,7 @@ public class PP2Commands implements CommandExecutor {
 			            	}
 						}
 			            
-			            // Détecte si l'on est bien sur un plotworld
+			            // Detecte si l'on est bien sur un plotworld
 			            if(PlotManager.getMap(p) == null) {
 				            p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".noplotworld")));
 				        } else {
@@ -72,14 +72,14 @@ public class PP2Commands implements CommandExecutor {
 				            if(id.equals("")) {
 				                p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".noplot")));
 				            } else {
-				            	// récupérer les infos du plot
+				            	// recuperer les infos du plot
 		    		            Plot plot = PlotManager.getPlotById(p);
 		    		            String joueur = p.getName();
 		    		            
-		    		            // Si plot != null alors le plot appartient à quelqu'un
+		    		            // Si plot != null alors le plot appartient a quelqu'un
 		    		            if(plot != null) {
 		    		            	String plotid = plot.id;
-		    		            	// Détecte si le plot appartient au joueur
+		    		            	// Detecte si le plot appartient au joueur
 		    		            	if ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin")){
 		    		            		
 		    		            		// Commande time
@@ -119,7 +119,7 @@ public class PP2Commands implements CommandExecutor {
 			    		            	
 			    		            	// Commande rate
 			    		            	if ((a0.equalsIgnoreCase("rate")) && p.hasPermission("plotplus.rate.set")){	
-			    		            		// Si la notation est activée
+			    		            		// Si la notation est activï¿½e
 			    		            		if(plugin.notationenabled){
 			    		            			plugin.fonctions.ratePlot(p, world, plotid, a1);
 												return true;
@@ -132,7 +132,7 @@ public class PP2Commands implements CommandExecutor {
 			    		            	
 			    		            	// Commande unrate
 			    		            	if ((a0.equalsIgnoreCase("unrate")) && p.hasPermission("plotplus.rate.set")){
-			    		            		// Si la notation est activée
+			    		            		// Si la notation est activï¿½e
 			    		            		if(plugin.notationenabled){
 			    		            			plugin.fonctions.unratePlot(p, world, plotid);
 				    		            		return true;
@@ -148,6 +148,12 @@ public class PP2Commands implements CommandExecutor {
 			    		            		plugin.fonctions.plotInfo(p, world, plotid);
 			    		            		return true;
 										}
+			    		            	
+			    		            	// Commande like
+			    		            	if (a0.equalsIgnoreCase("like")){
+			    		            		plugin.fonctions.plotLike(p, world, plotid);
+			    		            		return true;
+										}
 		    		            	}
 		    		            	
 		    		            	// Si le plot n'appartient pas au joueur
@@ -156,7 +162,7 @@ public class PP2Commands implements CommandExecutor {
 			    		            }
 		    		            }
 		    		            
-		    		            // Si le plot n'appartient à personne
+		    		            // Si le plot n'appartient ï¿½ personne
 		    		            else{
 		    		            	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".notowned")));
 		    		            }
