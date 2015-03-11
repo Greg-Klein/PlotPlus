@@ -4,6 +4,7 @@ rate-plots: true
 lang: en
 messages:
   en:
+    newversion: New version available
     noplotworld: This is not a plot world
     noplot: You are not on a plot
     notowned: This plot have no owner
@@ -22,11 +23,11 @@ messages:
     notationdisabled: Rating disabled
     notrated: '&cNot rated'
     notereset: Done
-    rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Where XX is an integer between 0 and 10)
     likeplot: You like this plot
     alreadylike: You already like this plot
     
   fr:
+    newversion: Nouvelle version disponible
     noplotworld: Ce n'est pas un Plotworld
     noplot: Vous n'etes pas sur un plot
     notowned: Ce plot n'a pas de propriétaire
@@ -36,7 +37,7 @@ messages:
     settime: Heure definie sur le plot
     badargument: Mauvais argument. /pp pour voir la syntaxe
     notyourplot: Ce n'est pas votre plot
-    nopermission: Vous n'avez pas la permission dutiliser cette commande
+    nopermission: Vous n'avez pas la permission d utiliser cette commande
     badtime: L'heure doit etre comprise entre 1 et 24000
     plotowner: 'Ce plot appartient a:'
     rated: '&2Note'
@@ -45,6 +46,5 @@ messages:
     notationdisabled: Notation désactivée
     notrated: '&cPas de note'
     notereset: Note réinitialisee
-    rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Où XX est un entier entre 0 et 10)
     likeplot: Vous aimez ce plot
     alreadylike: Vous aimez deja ce plot

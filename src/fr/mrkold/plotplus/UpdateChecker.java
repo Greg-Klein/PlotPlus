@@ -13,6 +13,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 public class UpdateChecker {
+	
+	public MainClass plugin;
+
+	public UpdateChecker(MainClass mainClass) {
+		this.plugin = mainClass;
+	}
 
     
     public static List<String> readURL(String url)
@@ -42,10 +48,10 @@ public class UpdateChecker {
             return null;
     }
     
-    public static String checkVersion(PluginDescriptionFile pdfFile){
+    public String checkVersion(PluginDescriptionFile pdfFile){
     	
     	VersionNumber currentVersion = new VersionNumber(pdfFile.getVersion());
-    	List<String> versionURL = readURL("http://www.mrkold.fr/pluginsversions/plotplus2.txt");
+    	List<String> versionURL = readURL("http://www.mrkold.fr/pluginsversions/plotplus.txt");
     	String lVersion = versionURL.get(0) + "." + versionURL.get(1) + "." + versionURL.get(2);
     	VersionNumber latestVersion = new VersionNumber(lVersion);
     	int cv0 = currentVersion.version[0];
@@ -55,7 +61,7 @@ public class UpdateChecker {
     	int lv1 = latestVersion.version[1];
     	int lv2 = latestVersion.version[2];
     	String noupd = "";
-    	String upd = ChatColor.AQUA + "[" + pdfFile.getName() + "] " + ChatColor.GREEN + "Nouvelle version disponible! (v"+ lVersion + ")";
+    	String upd = ChatColor.AQUA + "[" + pdfFile.getName() + "] " + ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".newversion") + " (v"+ lVersion + ")";
     	 
     	if(cv0 < lv0){
     	    return upd;

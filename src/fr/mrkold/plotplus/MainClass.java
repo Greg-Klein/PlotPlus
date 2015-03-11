@@ -42,6 +42,7 @@ public class MainClass extends JavaPlugin implements Listener {
 	public YamlConfiguration plots;
 	
 	public PP2Functions fonctions; 
+	public UpdateChecker ucheck;
 	
 	   
 	// ---------------------------------
@@ -82,7 +83,7 @@ public class MainClass extends JavaPlugin implements Listener {
         }
         plots = YamlConfiguration.loadConfiguration(myFile);
         
-        functions = new PP2Functions(this);
+        ucheck = new UpdateChecker(this);
         
         // Détection de BarAPI
         Plugin BarAPIPlugin = getServer().getPluginManager().getPlugin("BarAPI");
@@ -116,7 +117,7 @@ public class MainClass extends JavaPlugin implements Listener {
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(checkupdates && p.hasPermission("plotplus.admin")){
-			String udmsg = UpdateChecker.checkVersion(pdf);
+			String udmsg = ucheck.checkVersion(pdf);
 			if(!udmsg.equalsIgnoreCase("")){
 				e.getPlayer().sendMessage(udmsg);;
 			}

@@ -157,7 +157,7 @@ public class PP2Functions {
 			String owner = plot.owner;
 			owner = plotownerm + " " + ChatColor.AQUA + owner;
 			int Inblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
-			String nblike =  ChatColor.AQUA + "" + Inblike + ChatColor.GREEN + "like(s)";
+			String nblike =  ChatColor.AQUA + "" + Inblike + ChatColor.GREEN + " like(s)";
 			String mnote;
 
 			String Snote = (plugin.plots.getString("plots." + world + "." + plotid + ".rate"));
