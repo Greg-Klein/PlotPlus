@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import com.worldcretornica.plotme.Plot;
@@ -195,6 +196,7 @@ public class PP2Functions {
 					plugin.plots.set("plots." + world + "." + plotid + ".like", nblike);
 					savePlotConfig();
 					p.getWorld().playEffect(p.getLocation().add(0.0, 2.0, 0.0), Effect.HEART, 1);
+					p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
 					p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".likeplot"));
 				}
 
