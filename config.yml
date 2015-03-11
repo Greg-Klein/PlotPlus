@@ -24,6 +24,7 @@ messages:
     notereset: Done
     rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Where XX is an integer between 0 and 10)
     likeplot: You like this plot
+    alreadylike: You already like this plot
     
   fr:
     noplotworld: Ce n'est pas un Plotworld
@@ -45,4 +46,5 @@ messages:
     notrated: '&cPas de note'
     notereset: Note réinitialisee
     rateusage: /pp rate [style] [details] [purpose] [atmosphere] XX (Où XX est un entier entre 0 et 10)
-    likeplot: You like this plot
+    likeplot: Vous aimez ce plot
+    alreadylike: Vous aimez deja ce plot

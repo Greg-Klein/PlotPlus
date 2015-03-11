@@ -1,9 +1,11 @@
 package fr.mrkold.plotplus;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.entity.Player;
 
 import com.worldcretornica.plotme.Plot;
@@ -182,8 +184,17 @@ public class PP2Functions {
 		// like Plot
 				public void plotLike(Player p, String world, String plotid) {
 					int nblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
+					List<String> likers = plugin.plots.getStringList("plots." + world + "." + plotid + ".likers");
+					if(likers.contains(p.getName())){
+						p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".alreadylike"));
+						return;
+					}
+					likers.add(p.getName());
 					nblike++;
+					plugin.plots.set("plots." + world + "." + plotid + ".likers", likers);
 					plugin.plots.set("plots." + world + "." + plotid + ".like", nblike);
+					savePlotConfig();
+					p.getWorld().playEffect(p.getLocation().add(0.0, 2.0, 0.0), Effect.HEART, 1);
 					p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".likeplot"));
 				}
 
