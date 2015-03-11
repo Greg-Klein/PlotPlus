@@ -1,2 +1,2 @@
 # PlotPlus
-Set time and weather on your plot (PlotMe).
+Set time and weather on your plot (PlotMe)
