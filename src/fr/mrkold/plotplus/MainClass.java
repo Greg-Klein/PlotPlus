@@ -2,6 +2,7 @@ package fr.mrkold.plotplus;
 
 import java.io.File;
 import java.io.IOException;
+
 import me.confuser.barapi.BarAPI;
 
 import org.bukkit.ChatColor;
@@ -15,6 +16,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -200,8 +202,24 @@ public class MainClass extends JavaPlugin implements Listener {
 						BarAPI.removeBar(p);
 					}
 				}
+				// réinitialisation des paramètres
 				p.resetPlayerTime();
 				p.resetPlayerWeather();
 			}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	// Lorsque le joueur se TP
+	private void onTP(PlayerTeleportEvent evt){
+		Player p = evt.getPlayer();
+		// Si BarAPI est installé et activé on masque la barre
+		if(enableBar){
+			if(BarAPIOK && (BarAPI.hasBar(p))){
+				BarAPI.removeBar(p);
+			}
+		}
+		// réinitialisation des paramètres
+		p.resetPlayerTime();
+		p.resetPlayerWeather();
 	}
 }
