@@ -61,6 +61,14 @@ public class MainClass extends JavaPlugin implements Listener {
 	@Override
 	// A l'activation
 	public void onEnable() {
+		
+		try {
+	        Metrics metrics = new Metrics(this);
+	        metrics.start();
+	    } catch (IOException e) {
+	        // Failed to submit the stats :-(
+	    }
+		
 		getCommand("plotplus").setExecutor(new PP2Commands(this));
 		
 		fonctions = new PP2Functions(this);
