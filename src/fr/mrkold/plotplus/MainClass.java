@@ -2,6 +2,7 @@ package fr.mrkold.plotplus;
 
 import java.io.File;
 import java.io.IOException;
+
 import me.confuser.barapi.BarAPI;
 
 import org.bukkit.ChatColor;
@@ -15,6 +16,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,6 +44,7 @@ public class MainClass extends JavaPlugin implements Listener {
 	public YamlConfiguration plots;
 	
 	public PP2Functions fonctions; 
+	public UpdateChecker ucheck;
 	
 	   
 	// ---------------------------------
@@ -58,6 +61,14 @@ public class MainClass extends JavaPlugin implements Listener {
 	@Override
 	// A l'activation
 	public void onEnable() {
+		
+		try {
+	        Metrics metrics = new Metrics(this);
+	        metrics.start();
+	    } catch (IOException e) {
+	        // Failed to submit the stats :-(
+	    }
+		
 		getCommand("plotplus").setExecutor(new PP2Commands(this));
 		
 		fonctions = new PP2Functions(this);
@@ -82,7 +93,7 @@ public class MainClass extends JavaPlugin implements Listener {
         }
         plots = YamlConfiguration.loadConfiguration(myFile);
         
-        functions = new PP2Functions(this);
+        ucheck = new UpdateChecker(this);
         
         // Détection de BarAPI
         Plugin BarAPIPlugin = getServer().getPluginManager().getPlugin("BarAPI");
@@ -116,7 +127,7 @@ public class MainClass extends JavaPlugin implements Listener {
 	public void onJoin(PlayerJoinEvent e){
 		Player p = e.getPlayer();
 		if(checkupdates && p.hasPermission("plotplus.admin")){
-			String udmsg = UpdateChecker.checkVersion(pdf);
+			String udmsg = ucheck.checkVersion(pdf);
 			if(!udmsg.equalsIgnoreCase("")){
 				e.getPlayer().sendMessage(udmsg);;
 			}
@@ -199,8 +210,24 @@ public class MainClass extends JavaPlugin implements Listener {
 						BarAPI.removeBar(p);
 					}
 				}
+				// réinitialisation des paramètres
 				p.resetPlayerTime();
 				p.resetPlayerWeather();
 			}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGH)
+	// Lorsque le joueur se TP
+	private void onTP(PlayerTeleportEvent evt){
+		Player p = evt.getPlayer();
+		// Si BarAPI est installé et activé on masque la barre
+		if(enableBar){
+			if(BarAPIOK && (BarAPI.hasBar(p))){
+				BarAPI.removeBar(p);
+			}
+		}
+		// réinitialisation des paramètres
+		p.resetPlayerTime();
+		p.resetPlayerWeather();
 	}
 }
