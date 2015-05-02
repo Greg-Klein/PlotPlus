@@ -6,8 +6,11 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.worldcretornica.plotme.Plot;
-import com.worldcretornica.plotme.PlotManager;
+import com.worldcretornica.plotme_core.Plot;
+import com.worldcretornica.plotme_core.PlotMeCoreManager;
+import com.worldcretornica.plotme_core.bukkit.api.BukkitPlayer;
+import com.worldcretornica.plotme_core.bukkit.api.BukkitWorld;
+
 
 public class PP2Commands implements CommandExecutor {
 	
@@ -20,6 +23,7 @@ public class PP2Commands implements CommandExecutor {
 	private String a0;
 	private String a1;
 	private String a2;
+	private final PlotMeCoreManager plotManager = PlotMeCoreManager.getInstance();
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,	String label, String[] args) {
@@ -62,10 +66,12 @@ public class PP2Commands implements CommandExecutor {
 						}
 			            
 			            // Detecte si l'on est bien sur un plotworld
-			            if(PlotManager.getMap(p) == null) {
+			            BukkitWorld iworld = new BukkitWorld(p.getWorld());
+			            BukkitPlayer iplayer = new BukkitPlayer(p);
+			            if(plotManager.getMap(iworld) == null) {
 				            p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".noplotworld")));
 				        } else {
-				            String id = PlotManager.getPlotId(p);
+				            String id = plotManager.getPlotId(iplayer);
 				            String world = p.getWorld().getName();
 				            
 				         // id == "" : Ce n'est pas un plot
@@ -73,14 +79,14 @@ public class PP2Commands implements CommandExecutor {
 				                p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".noplot")));
 				            } else {
 				            	// recuperer les infos du plot
-		    		            Plot plot = PlotManager.getPlotById(p);
+		    		            Plot plot = plotManager.getPlotById(iplayer);
 		    		            String joueur = p.getName();
 		    		            
 		    		            // Si plot != null alors le plot appartient a quelqu'un
 		    		            if(plot != null) {
-		    		            	String plotid = plot.id;
+		    		            	String plotid = plot.getId();
 		    		            	// Detecte si le plot appartient au joueur
-		    		            	if ((plot.owner.equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin")){
+		    		            	if ((plot.getOwner().equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin")){
 		    		            		
 		    		            		// Commande time
 			    		            	if (a0.equalsIgnoreCase("time")) {

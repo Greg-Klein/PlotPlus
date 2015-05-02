@@ -61,7 +61,7 @@ public class UpdateChecker {
     	int lv1 = latestVersion.version[1];
     	int lv2 = latestVersion.version[2];
     	String noupd = "";
-    	String upd = ChatColor.AQUA + "[" + pdfFile.getName() + "] " + ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".newversion") + " (v"+ lVersion + ")";
+    	String upd = ChatColor.AQUA + "[" + pdfFile.getName() + "] " + ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".newversion") + " (v"+ lVersion + " - Minecraft 1.8.X)";
     	 
     	if(cv0 < lv0){
     	    return upd;

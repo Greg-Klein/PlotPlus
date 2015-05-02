@@ -9,14 +9,21 @@ import org.bukkit.Effect;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-import com.worldcretornica.plotme.Plot;
-import com.worldcretornica.plotme.PlotManager;
+
+
+
+
+import com.worldcretornica.plotme_core.Plot;
+import com.worldcretornica.plotme_core.PlotMeCoreManager;
+import com.worldcretornica.plotme_core.bukkit.api.BukkitPlayer;
 
 import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class PP2Functions {
 	
 	public MainClass plugin;
+	
+	private final PlotMeCoreManager plotManager = PlotMeCoreManager.getInstance();
 
 	public PP2Functions(MainClass mainClass) {
 		this.plugin = mainClass;
@@ -154,8 +161,9 @@ public class PP2Functions {
 		// plot Info
 		public void plotInfo(Player p, String world, String plotid) {
 			String plotownerm = plugin.getConfig().getString("messages."+ plugin.lang +".plotowner");
-			Plot plot = PlotManager.getPlotById(p);
-			String owner = plot.owner;
+			BukkitPlayer iplayer = new BukkitPlayer(p);
+			Plot plot = plotManager.getPlotById(iplayer);
+			String owner = plot.getOwner();
 			owner = plotownerm + " " + ChatColor.AQUA + owner;
 			int Inblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
 			String nblike =  ChatColor.AQUA + "" + Inblike + ChatColor.GREEN + " like(s)";

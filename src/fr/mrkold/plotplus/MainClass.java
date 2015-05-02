@@ -6,7 +6,6 @@ import java.io.IOException;
 import me.confuser.barapi.BarAPI;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,8 +20,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.worldcretornica.plotme.Plot;
-import com.worldcretornica.plotme.PlotManager;
+import com.worldcretornica.plotme_core.Plot;
+import com.worldcretornica.plotme_core.PlotMeCoreManager;
+import com.worldcretornica.plotme_core.bukkit.api.BukkitLocation;
+import com.worldcretornica.plotme_core.bukkit.api.BukkitPlayer;
 
 
 public class MainClass extends JavaPlugin implements Listener {
@@ -45,6 +46,8 @@ public class MainClass extends JavaPlugin implements Listener {
 	
 	public PP2Functions fonctions; 
 	public UpdateChecker ucheck;
+	
+	private final PlotMeCoreManager plotManager = PlotMeCoreManager.getInstance();
 	
 	   
 	// ---------------------------------
@@ -144,20 +147,23 @@ public class MainClass extends JavaPlugin implements Listener {
 	// Lorsque le joueur bouge
 	private void onMove(PlayerMoveEvent evt){
 			Player p = evt.getPlayer();
+			BukkitPlayer iplayer = new BukkitPlayer(p);
 			// Chargement du fichier plots.yml
 			File plotsFile = new File(this.getDataFolder(), "plots.yml");
 	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);
-	        Location moveFrom = evt.getFrom();
-			Location moveTo = evt.getTo();
-			String idTo = PlotManager.getPlotId(moveTo);
-	        String idFrom = PlotManager.getPlotId(moveFrom);
-	        Plot plot = PlotManager.getPlotById(p, idTo);
+	        //Location moveFrom = evt.getFrom();
+			//Location moveTo = evt.getTo();
+	        BukkitLocation moveFrom = new BukkitLocation(evt.getFrom());
+	        BukkitLocation moveTo = new BukkitLocation(evt.getTo());
+			String idTo = plotManager.getPlotId(moveTo);
+	        String idFrom = plotManager.getPlotId(moveFrom);
+	        Plot plot = plotManager.getPlotById(idTo, iplayer);
 	        String world = p.getWorld().getName();
 	        
 	     // Si l'on est sur un plot et qu'il appartient à quelqu'un
 	        if(fonctions.onPlot(p, idTo)){
 	        	if(plot != null){
-	        		String plotid = plot.id;
+	        		String plotid = plot.getId();
 		        	// Récuperation des données dans le fichier de configuration plots.yml
 					int heure = plots.getInt("plots." + world + "." + plotid + ".time");
 					Boolean rain = plots.getBoolean("plots." + world + "." + plotid + ".rain");
@@ -177,7 +183,7 @@ public class MainClass extends JavaPlugin implements Listener {
 					}
 	        	}
 	        	else{
-	        		String plotid = PlotManager.getPlotId(moveTo);
+	        		String plotid = plotManager.getPlotId(moveTo);
 	        		if(plotid != ""){
 	        			fonctions.clearPlotInfos(p, plotid);
 	        		}
@@ -191,10 +197,10 @@ public class MainClass extends JavaPlugin implements Listener {
 					// Si BarAPI est installé et activé
 					if(BarAPIOK){
 						if (enableBar){
-							String rank = fonctions.getRank(p, plot.owner); // On récupère le Préfix du joueur dans PermissionsEX
+							String rank = fonctions.getRank(p, plot.getOwner()); // On récupère le Préfix du joueur dans PermissionsEX
 							String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
 
-							String ncmessage = plotownerm + " " + rank + plot.owner;	
+							String ncmessage = plotownerm + " " + rank + plot.getOwner();	
 							String message = ChatColor.translateAlternateColorCodes('&', ncmessage);
 							BarAPI.setMessage(p, message);
 						}

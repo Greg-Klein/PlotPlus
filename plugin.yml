@@ -1,6 +1,6 @@
 name: PlotPlus
 main: fr.mrkold.plotplus.MainClass
-version: '2.0.2'
+version: '2.1.0'
 author: MrKold
 depend: [PlotMe]
 softdepend: [BarAPI, PermissionsEx]
