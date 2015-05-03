@@ -183,21 +183,26 @@ public class PP2Functions {
 		}
 		
 		// like Plot
-				public void plotLike(Player p, String world, String plotid) {
-					int nblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
-					List<String> likers = plugin.plots.getStringList("plots." + world + "." + plotid + ".likers");
-					if(likers.contains(p.getName())){
-						p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".alreadylike"));
-						return;
-					}
-					likers.add(p.getName());
-					nblike++;
-					plugin.plots.set("plots." + world + "." + plotid + ".likers", likers);
-					plugin.plots.set("plots." + world + "." + plotid + ".like", nblike);
-					savePlotConfig();
-					p.getWorld().playEffect(p.getLocation().add(0.0, 2.0, 0.0), Effect.HEART, 1);
-					p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
-					p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".likeplot"));
-				}
+		public void plotLike(Player p, String world, String plotid) {
+			int nblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
+			List<String> likers = plugin.plots.getStringList("plots." + world + "." + plotid + ".likers");
+			if(likers.contains(p.getName())){
+				p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".alreadylike"));
+				return;
+			}
+			likers.add(p.getName());
+			nblike++;
+			plugin.plots.set("plots." + world + "." + plotid + ".likers", likers);
+			plugin.plots.set("plots." + world + "." + plotid + ".like", nblike);
+			savePlotConfig();
+			p.getWorld().playEffect(p.getLocation().add(0.0, 2.0, 0.0), Effect.HEART, 1);
+			p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1, 1);
+			p.sendMessage(ChatColor.GREEN + plugin.getConfig().getString("messages."+ plugin.lang +".likeplot"));
+		}
+		
+		// NoPermission
+		public void noPerm(Player p){
+			p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nopermission")));
+		}
 
 }
