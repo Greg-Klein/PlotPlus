@@ -49,11 +49,7 @@ public class PP2Functions {
 	
 	// reset Time
 	public void resetTime(Player p, String world, String plotid) {
-		String weather = (plugin.plots.getString("plots." + world + "." + plotid + ".rain"));
 		plugin.plots.set("plots." + world + "." + plotid + ".time", null);
-		if(weather == null){
-			plugin.plots.set("plots." + world + "." + plotid, null);
-		}
 		savePlotConfig();
 		p.sendMessage(ChatColor.GREEN + (plugin.getConfig().getString("messages."+ plugin.lang +".resettime")));
 	}
@@ -67,11 +63,7 @@ public class PP2Functions {
 	
 	// reset Weather
 	public void resetWeather(Player p, String world, String plotid) {
-		String time = (plugin.plots.getString("plots." + world + "." + plotid + ".time"));
 		plugin.plots.set("plots." + world + "." + plotid + ".rain", null);
-		if(time == null){
-			plugin.plots.set("plots." + world + "." + plotid, null);
-		}
 		savePlotConfig();
 		p.sendMessage(ChatColor.GREEN + (plugin.getConfig().getString("messages."+ plugin.lang +".resetweather")));
 	}
