@@ -33,6 +33,7 @@ public class MainClass extends JavaPlugin implements Listener {
 	PP2Functions functions;
 
 	public String lang;
+	public boolean metrics;
 	public File myFile;
 	private PluginDescriptionFile pdf = this.getDescription();
 	public String version = pdf.getVersion();
@@ -65,12 +66,15 @@ public class MainClass extends JavaPlugin implements Listener {
 	// A l'activation
 	public void onEnable() {
 		
-		try {
-	        Metrics metrics = new Metrics(this);
-	        metrics.start();
-	    } catch (IOException e) {
-	        // Failed to submit the stats :-(
-	    }
+		metrics = getConfig().getBoolean("metrics");
+		if(metrics){
+			try {
+		        Metrics metrics = new Metrics(this);
+		        metrics.start();
+		    } catch (IOException e) {
+		        // Failed to submit the stats :-(
+		    }
+		}
 		
 		getCommand("plotplus").setExecutor(new PP2Commands(this));
 		
@@ -183,9 +187,14 @@ public class MainClass extends JavaPlugin implements Listener {
 					}
 	        	}
 	        	else{
-	        		String plotid = plotManager.getPlotId(moveTo);
-	        		if(plotid != ""){
-	        			fonctions.clearPlotInfos(p, plotid);
+	        		try{
+	        			String plotid = plotManager.getPlotId(moveTo);
+		        		if(plotid != ""){
+		        			fonctions.clearPlotInfos(p, plotid);
+		        		}
+	        		}
+	        		catch (NullPointerException e){
+	        			
 	        		}
 	        	}
 	        }

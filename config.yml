@@ -1,4 +1,5 @@
 check-for-updates: true
+metrics: true
 enable-BarAPI: true
 rate-plots: true
 lang: en
