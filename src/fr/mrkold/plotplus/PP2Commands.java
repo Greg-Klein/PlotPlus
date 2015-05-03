@@ -77,6 +77,29 @@ public class PP2Commands implements CommandExecutor {
 				    else {
 				        String id = plotManager.getPlotId(iplayer);
 				        String world = p.getWorld().getName();
+				        
+				        if (a0.equalsIgnoreCase("bm")){
+				        	if(args.length != 1){
+								String name;
+								name = a2;
+								if(a1.equalsIgnoreCase("delete")){
+	    		           			plugin.fonctions.bmDelete(p, world, name);
+	    		           			return true;
+								}
+	    		           		if(a1.equalsIgnoreCase("list")){
+	    		           			plugin.fonctions.bmList(p, world);
+	    		           			return true;
+								}
+	    		           		if(a1.equalsIgnoreCase("tp")){
+	    		           			plugin.fonctions.bmTP(p, world, name);
+	    		           			return true;
+								}
+    		           		}
+    		           		else{
+    		           			p.sendMessage(ChatColor.RED + "/pp bm save <name> | /pp bm delete <name> | /pp bm list | /pp bm tp <name>");
+    		           			return false;
+    		           		}
+				        }
 				            
 				        // id == "" : Ce n'est pas un plot
 				        if(id.equals(""))
@@ -152,13 +175,23 @@ public class PP2Commands implements CommandExecutor {
 		    		            	else
 		    		            		plugin.fonctions.noPerm(p);
 								}
-		    		            	// Commande info
-		    		            	if (a0.equalsIgnoreCase("info"))
-		    		            		plugin.fonctions.plotInfo(p, world, plotid);
+		    		            // Commande info
+		    		            if (a0.equalsIgnoreCase("info"))
+		    		            	plugin.fonctions.plotInfo(p, world, plotid);
 		    		            	
-		    		            	// Commande like
-		    		            	if (a0.equalsIgnoreCase("like"))
-		    		            		plugin.fonctions.plotLike(p, world, plotid);
+		    		            // Commande like
+		    		            if (a0.equalsIgnoreCase("like"))
+		    		            	plugin.fonctions.plotLike(p, world, plotid);
+		    		            
+		    		            // Commande Bookmark
+		    		            if (a0.equalsIgnoreCase("bm")){
+		    		            	if(args.length != 1){
+										String name;
+										name = a2;
+										if(a1.equalsIgnoreCase("save"))
+			    		           			plugin.fonctions.bmSave(p, world, plotid, name);
+		    		           		}
+		    		            }
 		    		            	
 		    		        }
 		    		            
