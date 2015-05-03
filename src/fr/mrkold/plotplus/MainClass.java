@@ -8,7 +8,6 @@ import me.confuser.barapi.BarAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -144,9 +143,6 @@ public class MainClass extends JavaPlugin implements Listener {
 	// Lorsque le joueur bouge
 	private void onMove(PlayerMoveEvent evt){
 			Player p = evt.getPlayer();
-			// Chargement du fichier plots.yml
-			File plotsFile = new File(this.getDataFolder(), "plots.yml");
-	        FileConfiguration plots = YamlConfiguration.loadConfiguration(plotsFile);
 	        Location moveFrom = evt.getFrom();
 			Location moveTo = evt.getTo();
 			String idTo = PlotManager.getPlotId(moveTo);
