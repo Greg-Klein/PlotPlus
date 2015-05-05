@@ -287,7 +287,7 @@ public class PP2Functions {
 	        try{
 	        	set = userfile.getConfigurationSection("bookmarks."+world).getKeys(false);
 	        	String stringset = (set.toString().substring(0, set.toString().length()-1)).substring(1);
-	        	p.sendMessage(ChatColor.GREEN+stringset);
+	        	p.sendMessage(stringset);
 	        }
 	        catch(NullPointerException e){
 	        	// catch block
@@ -310,7 +310,7 @@ public class PP2Functions {
 	        	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nobm")));
 	        	return;
 	        }
-	        World world = plugin.getServer().getWorld(w);
+	        World world = p.getWorld();
 	        BukkitWorld iworld = new BukkitWorld(world);
 	        ILocation loc = plotManager.getPlotHome(iworld, buff);
 	        Location location = p.getLocation();
