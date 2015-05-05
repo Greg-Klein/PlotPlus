@@ -1,12 +1,17 @@
 package fr.mrkold.plotplus;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import com.worldcretornica.plotme.Plot;
@@ -196,5 +201,117 @@ public class PP2Functions {
 		public void noPerm(Player p){
 			p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nopermission")));
 		}
+		
+		// BmSave
+				public void bmSave(Player p, String world, String plotid, String name){
+					String plotowner = PlotManager.getPlotById(p.getLocation()).getOwner();
+					// Créer le fichier utilisateur s'il n'existe pas
+					String playername = p.getName().toString();
+					String filename = playername + ".yml";
+			        File userFile = new File(plugin.getDataFolder(), filename);
+			        if (!userFile.exists()) {
+			            try {
+			                userFile.createNewFile();
+			            } catch (IOException e) {
+			                e.printStackTrace();
+			            }
+			        }
+			        YamlConfiguration userfile = YamlConfiguration.loadConfiguration(userFile);
+			        
+			        // Verifier que le bm n existe pas déjà
+			        String buff = userfile.getString("bookmarks."+world+"."+name+".id");
+			        if(buff != null){
+			        	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".bmexist")));
+			        	return;
+			        }
+			        // ecriture du bm
+			        userfile.set("bookmarks."+world+"."+name+".id", plotid);
+			        userfile.set("bookmarks."+world+"."+name+".owner", plotowner);
+			        //sauvegarde
+					try {
+						userfile.save(userFile);
+						p.sendMessage(ChatColor.GREEN+"Bookmark "+name+" saved");
+					} catch (IOException e) {
+						// catch block
+						e.printStackTrace();
+					}
+				}
+				
+				// BmDelete
+				public void bmDelete(Player p, String world, String name){
+					String playername = p.getName().toString();
+					String filename = playername + ".yml";
+					File userFile = new File(plugin.getDataFolder(), filename);
+			        if (!userFile.exists()) {
+			        	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nobm")));
+			        	return;
+			        }
+			        YamlConfiguration userfile = YamlConfiguration.loadConfiguration(userFile);
+			     // Verifier que le bm existe
+			        String buff = userfile.getString("bookmarks."+world+"."+name+".id");
+			        if(buff == null){
+			        	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nobm")));
+			        	return;
+			        }
+			        // ecriture du bm
+			        userfile.set("bookmarks."+world+"."+name, null);
+			        //sauvegarde
+					try {
+						userfile.save(userFile);
+						p.sendMessage(ChatColor.GREEN+"Bookmark "+name+" removed");
+					} catch (IOException e) {
+						// catch block
+						e.printStackTrace();
+					}
+				}
+				
+				//BmList
+				public void bmList(Player p, String world){
+					String playername = p.getName().toString();
+					String filename = playername + ".yml";
+					Set<String> set;
+					File userFile = new File(plugin.getDataFolder(), filename);
+					p.sendMessage(ChatColor.GREEN+"----------");
+			        p.sendMessage(ChatColor.GREEN+" Bookmarks:");
+			        p.sendMessage(ChatColor.GREEN+"----------");
+			        if (!userFile.exists()) {
+			        	return;
+			        }
+			        YamlConfiguration userfile = YamlConfiguration.loadConfiguration(userFile);
+			        try{
+			        	set = userfile.getConfigurationSection("bookmarks."+world).getKeys(false);
+			        	String stringset = (set.toString().substring(0, set.toString().length()-1)).substring(1);
+			        	p.sendMessage(stringset);
+			        }
+			        catch(NullPointerException e){
+			        	// catch block
+			        }
+				}
+				
+				//BmTP
+				public void bmTP(Player p, String w, String name){
+					String playername = p.getName().toString();
+					String filename = playername + ".yml";
+					File userFile = new File(plugin.getDataFolder(), filename);
+			        if (!userFile.exists()) {
+			        	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nobm")));
+			        	return;
+			        }
+			        YamlConfiguration userfile = YamlConfiguration.loadConfiguration(userFile);
+			        // Verifier que le bm existe
+			        String buff = userfile.getString("bookmarks."+w+"."+name+".id");
+			        if(buff == null){
+			        	p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".nobm")));
+			        	return;
+			        }
+			        World world = p.getWorld();
+			        Plot plot = PlotManager.getPlotById(world, buff);
+			        Location location = PlotManager.getPlotHome(world, plot);
+			        
+			        p.getLocation().setPitch(0.0f);
+			        p.getLocation().setYaw(0.0f);
+			        p.sendMessage(ChatColor.GRAY+"Teleporting...");
+			        p.teleport(location);
+				}
 
 }
