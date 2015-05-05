@@ -25,6 +25,8 @@ messages:
     notereset: Done
     likeplot: You like this plot
     alreadylike: You already like this plot
+    bmexist: Bookmark already exist
+    nobm: No bookmark
     
   fr:
     newversion: Nouvelle version disponible
@@ -48,3 +50,5 @@ messages:
     notereset: Note réinitialisee
     likeplot: Vous aimez ce plot
     alreadylike: Vous aimez deja ce plot
+    bmexist: Le bookmark existe déjà
+    nobm: Pas de bookmark
