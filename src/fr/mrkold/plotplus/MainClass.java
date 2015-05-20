@@ -149,6 +149,14 @@ public class MainClass extends JavaPlugin implements Listener {
 	        String idFrom = PlotManager.getPlotId(moveFrom);
 	        Plot plot = PlotManager.getPlotById(p, idTo);
 	        String world = p.getWorld().getName();
+	        long time = p.getWorld().getTime();
+	        
+	     // Si plotworld et time != 6000 on remets 6000
+	        if(time != 6000 && PlotManager.isPlotWorld(p.getWorld())){
+	        	p.getWorld().setTime(6000);
+	        	p.sendMessage(ChatColor.RED + getConfig().getString("messages."+ lang +".plotworldchangetimel1"));
+	        	p.sendMessage(ChatColor.RED + getConfig().getString("messages."+ lang +".plotworldchangetimel2"));
+	        }
 	        
 	     // Si l'on est sur un plot et qu'il appartient à quelqu'un
 	        if(fonctions.onPlot(p, idTo)){

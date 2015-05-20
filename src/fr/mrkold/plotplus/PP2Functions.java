@@ -14,10 +14,10 @@ import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import ru.tehkode.permissions.bukkit.PermissionsEx;
+
 import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
-
-import ru.tehkode.permissions.bukkit.PermissionsEx;
 
 public class PP2Functions {
 	

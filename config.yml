@@ -27,6 +27,8 @@ messages:
     alreadylike: You already like this plot
     bmexist: Bookmark already exist
     nobm: No bookmark
+    plotworldchangetimel1: You can't change time in the plotworld
+    plotworldchangetimel2: Use /pp to change time on plots
     
   fr:
     newversion: Nouvelle version disponible
@@ -52,3 +54,5 @@ messages:
     alreadylike: Vous aimez deja ce plot
     bmexist: Le bookmark existe déjà
     nobm: Pas de bookmark
+    plotworldchangetimel1: Vous ne pouvez pas changer l'heure du plotworld
+    plotworldchangetimel2: Utilisez /pp pour changer l'heure sur les plots
