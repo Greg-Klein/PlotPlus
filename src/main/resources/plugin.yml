@@ -1,0 +1,11 @@
+name: PlotPlus
+main: fr.mrkold.plotplus.MainClass
+version: '2.2.0'
+author: MrKold
+depend: [PlotMe]
+softdepend: [BarAPI, PermissionsEx]
+description: Change time and weather on your plot
+commands:
+    plotplus:
+      aliases: [pp]
+      description: Usage /pp weather | /pp time | /pp bm | /pp like | /pp rate | /pp unrate

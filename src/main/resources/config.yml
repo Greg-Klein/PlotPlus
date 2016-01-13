@@ -1,0 +1,58 @@
+check-for-updates: true
+enable-BarAPI: true
+rate-plots: true
+lang: en
+messages:
+  en:
+    newversion: New version available
+    noplotworld: This is not a plot world
+    noplot: You are not on a plot
+    notowned: This plot have no owner
+    resettime: Time reinitialised on plot
+    resetweather: Weather reinitialised on plot
+    setrain: Rain set on plot
+    settime: Time set on plot
+    badargument: Bad argument. /pp to see the syntax
+    notyourplot: This is not your plot
+    nopermission: You don't have permission to use this command
+    badtime: Time must be between 1 and 24000
+    plotowner: 'Plot owner:'
+    rated: '&2Rated'
+    noteset: You rated this plot
+    badnotation: Notation must be an integer between 0 and 20
+    notationdisabled: Rating disabled
+    notrated: '&cNot rated'
+    notereset: Done
+    likeplot: You like this plot
+    alreadylike: You already like this plot
+    bmexist: Bookmark already exist
+    nobm: No bookmark
+    plotworldchangetimel1: You can't change time in the plotworld
+    plotworldchangetimel2: Use /pp to change time on plots
+    
+  fr:
+    newversion: Nouvelle version disponible
+    noplotworld: Ce n'est pas un Plotworld
+    noplot: Vous n'etes pas sur un plot
+    notowned: Ce plot n'a pas de propriétaire
+    resettime: Heure reinitialisee sur le plot
+    resetweather: Meteo reinitialisee sur le plot
+    setrain: Pluie programmee sur le plot
+    settime: Heure definie sur le plot
+    badargument: Mauvais argument. /pp pour voir la syntaxe
+    notyourplot: Ce n'est pas votre plot
+    nopermission: Vous n'avez pas la permission d utiliser cette commande
+    badtime: L'heure doit etre comprise entre 1 et 24000
+    plotowner: 'Ce plot appartient a:'
+    rated: '&2Note'
+    noteset: Vous avez note le plot
+    badnotation: La note doit être un entier entre 0 et 20
+    notationdisabled: Notation désactivée
+    notrated: '&cPas de note'
+    notereset: Note réinitialisee
+    likeplot: Vous aimez ce plot
+    alreadylike: Vous aimez deja ce plot
+    bmexist: Le bookmark existe déjà
+    nobm: Pas de bookmark
+    plotworldchangetimel1: Vous ne pouvez pas changer l'heure du plotworld
+    plotworldchangetimel2: Utilisez /pp pour changer l'heure sur les plots
