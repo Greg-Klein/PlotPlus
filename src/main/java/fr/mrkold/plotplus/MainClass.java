@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import me.confuser.barapi.BarAPI;
+import update.checker.UpdateChecker;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -43,7 +44,7 @@ public class MainClass extends JavaPlugin implements Listener {
 	boolean notationenabled;
 	public YamlConfiguration plots;
 	
-	public PP2Functions fonctions; 
+	public PP2Functions functionsHandler; 
 	public UpdateChecker ucheck;
 	
 	   
@@ -71,7 +72,7 @@ public class MainClass extends JavaPlugin implements Listener {
 		
 		getCommand("plotplus").setExecutor(new PP2Commands(this));
 		
-		fonctions = new PP2Functions(this);
+		functionsHandler = new PP2Functions(this);
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		// Sauvegarde de la configuration par defaut
@@ -160,7 +161,7 @@ public class MainClass extends JavaPlugin implements Listener {
 	        }
 	        
 	     // Si l'on est sur un plot et qu'il appartient à quelqu'un
-	        if(fonctions.onPlot(p, idTo)){
+	        if(functionsHandler.onPlot(p, idTo)){
 	        	if(plot != null){
 	        		String plotid = plot.id;
 		        	// Récuperation des données dans le fichier de configuration plots.yml
@@ -184,19 +185,19 @@ public class MainClass extends JavaPlugin implements Listener {
 	        	else{
 	        		String plotid = PlotManager.getPlotId(moveTo);
 	        		if(plotid != ""){
-	        			fonctions.clearPlotInfos(p, plotid);
+	        			functionsHandler.clearPlotInfos(p, plotid);
 	        		}
 	        	}
 	        }
 			
 	     // On teste si l'on entre sur un plot
-			if((!fonctions.onPlot(p, idFrom))&&(fonctions.onPlot(p, idTo))){
+			if((!functionsHandler.onPlot(p, idFrom))&&(functionsHandler.onPlot(p, idTo))){
 				// Si le plot appartient à quelqu'un
 				if(plot != null){					
 					// Si BarAPI est installé et activé
 					if(BarAPIOK){
 						if (enableBar){
-							String rank = fonctions.getRank(p, plot.owner); // On récupère le Préfix du joueur dans PermissionsEX
+							String rank = functionsHandler.getRank(p, plot.owner); // On récupère le Préfix du joueur dans PermissionsEX
 							String plotownerm = getConfig().getString("messages."+ lang +".plotowner");
 
 							String ncmessage = plotownerm + " " + rank + plot.owner;	
@@ -208,7 +209,7 @@ public class MainClass extends JavaPlugin implements Listener {
 			}
 			
 			// Si l'on sort d'un plot on rétablit les paramètres par défaut
-			else if ((fonctions.onPlot(p, idFrom))&&(!fonctions.onPlot(p, idTo))) {
+			else if ((functionsHandler.onPlot(p, idFrom))&&(!functionsHandler.onPlot(p, idTo))) {
 				// Si BarAPI est installé et activé on masque la barre
 				if(enableBar){
 					if(BarAPIOK && (BarAPI.hasBar(p))){

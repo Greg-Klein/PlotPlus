@@ -1,4 +1,4 @@
-package fr.mrkold.plotplus;
+package update.checker;
 
 public class VersionNumber {
 	

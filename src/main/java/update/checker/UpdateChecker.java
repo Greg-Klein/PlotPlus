@@ -1,4 +1,4 @@
-package fr.mrkold.plotplus;
+package update.checker;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginDescriptionFile;
+
+import fr.mrkold.plotplus.MainClass;
 
 public class UpdateChecker {
 	

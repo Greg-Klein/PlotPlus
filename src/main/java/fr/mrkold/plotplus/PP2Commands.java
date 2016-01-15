@@ -30,7 +30,7 @@ public class PP2Commands implements CommandExecutor {
 		    if(sender instanceof Player) {
 		    	Player p = (Player) sender;
 		    	if(!p.hasPermission("plotplus.use")){
-		    		plugin.fonctions.noPerm(p);
+		    		plugin.functionsHandler.noPerm(p);
 		    		return false;
 		    	}
 		    	// Si la commande n'a pas d'argument on affiche l'aide
@@ -60,7 +60,7 @@ public class PP2Commands implements CommandExecutor {
 			           		return true;
 			           	}
 			           	else{
-			           		plugin.fonctions.noPerm(p);
+			           		plugin.functionsHandler.noPerm(p);
 			           		return false;
 			        	}
 					}
@@ -77,15 +77,15 @@ public class PP2Commands implements CommandExecutor {
 								String name;
 								name = a2;
 								if(a1.equalsIgnoreCase("delete")){
-	    		           			plugin.fonctions.bmDelete(p, world, name);
+	    		           			plugin.functionsHandler.bmDelete(p, world, name);
 	    		           			return true;
 								}
 	    		           		if(a1.equalsIgnoreCase("list")){
-	    		           			plugin.fonctions.bmList(p, world);
+	    		           			plugin.functionsHandler.bmList(p, world);
 	    		           			return true;
 								}
 	    		           		if(a1.equalsIgnoreCase("tp")){
-	    		           			plugin.fonctions.bmTP(p, world, name);
+	    		           			plugin.functionsHandler.bmTP(p, world, name);
 	    		           			return true;
 								}
     		           		}
@@ -113,10 +113,10 @@ public class PP2Commands implements CommandExecutor {
 		    		           		if ((plot.getOwner().equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin") || p.isOp()){
 		    		           			if(args.length != 1){
 			    		           			if(a1.equalsIgnoreCase("reset"))
-				    		           			plugin.fonctions.resetTime(p, world, plotid);
+				    		           			plugin.functionsHandler.resetTime(p, world, plotid);
 				    		           		if(a1.equalsIgnoreCase("set")){
 				    		           			if(a2 != null)
-				    		           				plugin.fonctions.setHeure(p, world, plotid, a2);
+				    		           				plugin.functionsHandler.setTime(p, world, plotid, a2);
 				    		           			else
 				    		           				p.sendMessage(ChatColor.RED + "/pp time set <ticks>");
 				    		           		}
@@ -133,9 +133,9 @@ public class PP2Commands implements CommandExecutor {
 		    		            	if ((plot.getOwner().equalsIgnoreCase(joueur)) || p.hasPermission("plotplus.admin") || p.isOp()){
 		    		            		if(args.length != 1){
 			    		           			if(a1.equalsIgnoreCase("rain"))
-				    		           			plugin.fonctions.setRain(p, world, plotid);
+				    		           			plugin.functionsHandler.setRain(p, world, plotid);
 				    		           		if(a1.equalsIgnoreCase("reset"))
-				    		           			plugin.fonctions.resetWeather(p, world, plotid);
+				    		           			plugin.functionsHandler.resetWeather(p, world, plotid);
 			    		           		}
 			    		           		else
 			    		           			p.sendMessage(ChatColor.RED + "/pp weather rain | /pp weather reset");
@@ -149,12 +149,12 @@ public class PP2Commands implements CommandExecutor {
 		    		            	if(p.hasPermission("plotplus.rate") || p.hasPermission("plotplus.admin")){
 		    		            		// Si la notation est activee
 			    		            	if(plugin.notationenabled)
-			    		            		plugin.fonctions.ratePlot(p, world, plotid, a1);
+			    		            		plugin.functionsHandler.ratePlot(p, world, plotid, a1);
 			    		            	else
 			    		            		p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".notationdisabled")));
 		    		            	}
 		    		            	else
-		    		            		plugin.fonctions.noPerm(p);
+		    		            		plugin.functionsHandler.noPerm(p);
 								}
 		    		            	
 		    		            // Commande unrate
@@ -162,20 +162,20 @@ public class PP2Commands implements CommandExecutor {
 		    		            	if(p.hasPermission("plotplus.rate") || p.hasPermission("plotplus.admin")){
 		    		            		// Si la notation est activee
 			    		           		if(plugin.notationenabled)
-			    		           			plugin.fonctions.unratePlot(p, world, plotid);
+			    		           			plugin.functionsHandler.unratePlot(p, world, plotid);
 			    		           		else
 			    		           			p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".notationdisabled")));
 		    		            	}
 		    		            	else
-		    		            		plugin.fonctions.noPerm(p);
+		    		            		plugin.functionsHandler.noPerm(p);
 								}
 		    		            	// Commande info
 		    		            	if (a0.equalsIgnoreCase("info"))
-		    		            		plugin.fonctions.plotInfo(p, world, plotid);
+		    		            		plugin.functionsHandler.plotInfo(p, world, plotid);
 		    		            	
 		    		            	// Commande like
 		    		            	if (a0.equalsIgnoreCase("like"))
-		    		            		plugin.fonctions.plotLike(p, world, plotid);
+		    		            		plugin.functionsHandler.likePlot(p, world, plotid);
 		    		            	
 		    		            	// Commande Bookmark
 			    		            if (a0.equalsIgnoreCase("bm")){
@@ -183,7 +183,7 @@ public class PP2Commands implements CommandExecutor {
 											String name;
 											name = a2;
 											if(a1.equalsIgnoreCase("save"))
-				    		           			plugin.fonctions.bmSave(p, world, plotid, name);
+				    		           			plugin.functionsHandler.bmSave(p, world, plotid, name);
 			    		           		}
 			    		            }
 		    		            	

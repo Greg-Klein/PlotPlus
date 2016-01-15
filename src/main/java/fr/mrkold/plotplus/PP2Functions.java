@@ -21,7 +21,7 @@ import com.worldcretornica.plotme.PlotManager;
 
 public class PP2Functions {
 	
-	public MainClass plugin;
+	private MainClass plugin;
 
 	public PP2Functions(MainClass mainClass) {
 		this.plugin = mainClass;
@@ -36,7 +36,7 @@ public class PP2Functions {
 	}
 	
 	// save Plot Config
-	public void savePlotConfig() {
+	private void savePlotConfig() {
 		try {
 			plugin.plots.save(plugin.myFile);
 		} catch (IOException e) {
@@ -67,17 +67,17 @@ public class PP2Functions {
 	}
 	
 	// set Heure
-	public boolean setHeure(Player p, String world, String plotid, String a0) {
+	public boolean setTime(Player p, String world, String plotid, String a0) {
 		try {
-			int setheure = -1;
-			setheure =  Integer.parseInt(a0);
-			if ((setheure < 0)||(setheure > 24000)){
+			int time = -1;
+			time =  Integer.parseInt(a0);
+			if ((time < 0)||(time > 24000)){
 				p.sendMessage(ChatColor.RED + (plugin.getConfig().getString("messages."+ plugin.lang +".badtime")));
 				return false;
 			}
-			plugin.plots.set("plots." + world + "." + plotid + ".time", setheure);
+			plugin.plots.set("plots." + world + "." + plotid + ".time", time);
 			savePlotConfig();
-		    p.sendMessage(ChatColor.GREEN + (plugin.getConfig().getString("messages."+ plugin.lang +".settime")) + ": " + setheure + "ticks");
+		    p.sendMessage(ChatColor.GREEN + (plugin.getConfig().getString("messages."+ plugin.lang +".settime")) + ": " + time + "ticks");
 		    return true;
 		}
 		catch (NumberFormatException nfe) {
@@ -133,7 +133,7 @@ public class PP2Functions {
 				return false;
 			}
 			else{
-				int note = plugin.fonctions.testNote(p, a1);
+				int note = plugin.functionsHandler.testNote(p, a1);
 					plugin.plots.set("plots." + world + "." + plotid + ".rate", note);
 					savePlotConfig();
 					p.sendMessage(ChatColor.GREEN + (plugin.getConfig().getString("messages."+ plugin.lang +".noteset")) + " (" + note + "/20)");
@@ -180,7 +180,7 @@ public class PP2Functions {
 		}
 		
 		// like Plot
-		public void plotLike(Player p, String world, String plotid) {
+		public void likePlot(Player p, String world, String plotid) {
 			int nblike = plugin.plots.getInt("plots." + world + "." + plotid + ".like");
 			List<String> likers = plugin.plots.getStringList("plots." + world + "." + plotid + ".likers");
 			if(likers.contains(p.getName())){
