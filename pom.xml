@@ -6,19 +6,11 @@
   <name>PlotPlus</name>
   <repositories>
   	<repository>
-        <id>spigot-old</id>
-        <url>http://mrkold.fr:8081/nexus/content/repositories/spigot-old/</url>
-    </repository>
-    <repository>
-    	<id>releases</id>
-    	<url>http://mrkold.fr:8081/nexus/content/repositories/releases/</url>
+  		<id>public</id>
+  		<url>http://mrkold.fr:8081/nexus/content/groups/public/</url>
   	</repository>
-  	<repository>
-        <id>sk89q-release</id>
-        <url>http://mrkold.fr:8081/nexus/content/repositories/sk89q-release/</url>
-    </repository>
-</repositories>
-<dependencies>
+  </repositories>
+  <dependencies>
     <!--Spigot API-->
     <dependency>
            <groupId>org.spigotmc</groupId>
@@ -58,5 +50,5 @@
            <version>1.22.7</version>
            <scope>provided</scope>
     </dependency>
-</dependencies>
+  </dependencies>
 </project>
